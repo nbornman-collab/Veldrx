@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Farm Map — VeldRx</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --green-dark: #1e3a1e;
+      --green-mid: #2d5c2d;
+      --green-light: #4a8c4a;
+      --green-pale: #e8f0e8;
+      --white: #ffffff;
+      --grey-light: #f7f8f6;
+      --grey-mid: #e2e8e2;
+      --text-dark: #1a2418;
+      --text-mid: #4a5a4a;
+      --text-light: #7a8a7a;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--grey-light); height: 100vh; display: flex; flex-direction: column; }
+
+    nav {
+      background: white; border-bottom: 1px solid var(--grey-mid);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 56px; flex-shrink: 0; z-index: 1000;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-mark { width: 28px; height: 28px; background: var(--green-dark); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; font-weight: 700; }
+    .nav-logo-text { font-size: 16px; font-weight: 700; color: var(--green-dark); }
+    .nav-center { display: flex; gap: 4px; }
+    .map-tab {
+      padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500;
+      cursor: pointer; border: none; background: transparent; color: var(--text-mid);
+      transition: all 0.15s;
+    }
+    .map-tab.active { background: var(--green-pale); color: var(--green-dark); font-weight: 600; }
+    .nav-right { display: flex; gap: 12px; align-items: center; }
+    .nav-pill {
+      background: var(--green-pale); color: var(--green-dark);
+      padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .nav-btn {
+      background: var(--green-dark); color: white; padding: 7px 16px;
+      border-radius: 6px; font-size: 13px; font-weight: 600;
+      text-decoration: none; border: none; cursor: pointer;
+    }
+
+    .app { display: flex; flex: 1; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 340px; flex-shrink: 0; background: white;
+      border-right: 1px solid var(--grey-mid); display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .sidebar-header { padding: 16px 20px; border-bottom: 1px solid var(--grey-mid); }
+    .sidebar-title { font-size: 14px; font-weight: 700; color: var(--green-dark); }
+    .sidebar-sub { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+    .sidebar-search {
+      margin: 12px 20px 0;
+      display: flex; align-items: center; gap: 8px;
+      background: var(--grey-light); border-radius: 8px; padding: 8px 12px;
+    }
+    .sidebar-search input {
+      border: none; background: transparent; font-size: 13px;
+      color: var(--text-dark); outline: none; width: 100%;
+      font-family: 'Inter', sans-serif;
+    }
+    .sidebar-search span { color: var(--text-light); font-size: 14px; }
+    .sidebar-filters { display: flex; gap: 6px; padding: 12px 20px; border-bottom: 1px solid var(--grey-mid); }
+    .filter-chip {
+      padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid var(--grey-mid); background: white;
+      color: var(--text-mid); transition: all 0.15s;
+    }
+    .filter-chip.active { border-color: var(--green-dark); background: var(--green-dark); color: white; }
+    .farm-list { flex: 1; overflow-y: auto; }
+    .farm-item {
+      padding: 14px 20px; border-bottom: 1px solid var(--grey-mid);
+      cursor: pointer; transition: background 0.1s; display: flex; gap: 12px; align-items: flex-start;
+    }
+    .farm-item:hover { background: var(--grey-light); }
+    .farm-item.selected { background: var(--green-pale); }
+    .farm-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .farm-item-name { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+    .farm-item-meta { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+    .farm-item-tag {
+      display: inline-block; padding: 1px 7px; border-radius: 10px;
+      font-size: 10px; font-weight: 700; margin-top: 4px;
+    }
+    .tag-ok { background: #dcfce7; color: #166534; }
+    .tag-warn { background: #fef9c3; color: #854d0e; }
+    .tag-alert { background: #fee2e2; color: #991b1b; }
+
+    /* DETAIL PANEL */
+    .detail-panel {
+      display: none; flex-direction: column;
+      border-top: 1px solid var(--grey-mid); background: white;
+    }
+    .detail-panel.open { display: flex; }
+    .detail-header { padding: 16px 20px; background: var(--green-dark); color: white; }
+    .detail-farm-name { font-size: 16px; font-weight: 700; }
+    .detail-farm-sub { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+    .detail-close { float: right; background: none; border: none; color: white; cursor: pointer; font-size: 18px; }
+    .detail-body { padding: 16px 20px; overflow-y: auto; max-height: 300px; }
+    .detail-section { margin-bottom: 16px; }
+    .detail-section-title { font-size: 10px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--grey-mid); font-size: 12px; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row-label { color: var(--text-light); }
+    .detail-row-val { font-weight: 600; color: var(--text-dark); }
+    .drug-row { background: var(--grey-light); border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; }
+    .drug-name { font-size: 12px; font-weight: 600; color: var(--text-dark); }
+    .drug-meta { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+    .withdrawal-badge { display: inline-block; padding: 1px 6px; background: #fef9c3; color: #854d0e; border-radius: 8px; font-size: 10px; font-weight: 700; }
+    .detail-action { display: block; text-align: center; margin: 12px 20px; padding: 10px; background: var(--green-dark); color: white; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; }
+
+    /* MAP */
+    .map-container { flex: 1; position: relative; }
+    #main-map { width: 100%; height: 100%; }
+
+    .map-controls {
+      position: absolute; top: 16px; right: 16px; z-index: 500;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .map-control-btn {
+      background: white; border: 1px solid var(--grey-mid);
+      border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;
+      color: var(--text-dark); cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .map-control-btn.active { background: var(--green-dark); color: white; border-color: var(--green-dark); }
+
+    .map-stats {
+      position: absolute; bottom: 24px; right: 16px; z-index: 500;
+      display: flex; gap: 8px;
+    }
+    .map-stat {
+      background: white; border-radius: 8px; padding: 10px 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1); text-align: center;
+    }
+    .map-stat-val { font-size: 20px; font-weight: 700; color: var(--green-dark); }
+    .map-stat-label { font-size: 10px; color: var(--text-light); margin-top: 1px; }
+
+    .leaflet-popup-content-wrapper { border-radius: 10px; }
+    .farm-popup h4 { font-size: 13px; font-weight: 700; color: var(--green-dark); margin-bottom: 6px; }
+    .farm-popup p { font-size: 11px; color: #4a5a4a; margin: 2px 0; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">V</div>
+    <div class="nav-logo-text">VeldRx</div>
+  </a>
+  <div class="nav-center">
+    <button class="map-tab active" onclick="setLayer('topo')">Terrain</button>
+    <button class="map-tab" onclick="setLayer('satellite')">Satellite</button>
+    <button class="map-tab" onclick="setLayer('intel')">Disease Intel</button>
+  </div>
+  <div class="nav-right">
+    <span class="nav-pill">The Animal Hospital · Darling</span>
+    <a href="farm/rooiberg.html" class="nav-btn">+ Log dispensing</a>
+  </div>
+</nav>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Client Farms</div>
+      <div class="sidebar-sub">6 farms · Swartland / West Coast corridor</div>
+    </div>
+    <div class="sidebar-search">
+      <span>🔍</span>
+      <input type="text" placeholder="Search farms..." id="search-input" oninput="filterFarms()" />
+    </div>
+    <div class="sidebar-filters">
+      <button class="filter-chip active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-chip" onclick="setFilter('ok', this)">Compliant</button>
+      <button class="filter-chip" onclick="setFilter('warn', this)">Withdrawal</button>
+      <button class="filter-chip" onclick="setFilter('alert', this)">Attention</button>
+    </div>
+    <div class="farm-list" id="farm-list"></div>
+    <div class="detail-panel" id="detail-panel">
+      <div class="detail-header">
+        <button class="detail-close" onclick="closeDetail()">✕</button>
+        <div class="detail-farm-name" id="detail-name"></div>
+        <div class="detail-farm-sub" id="detail-sub"></div>
+      </div>
+      <div class="detail-body" id="detail-body"></div>
+      <a href="farm/rooiberg.html" class="detail-action">View full farm profile →</a>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="map-container">
+    <div id="main-map"></div>
+    <div class="map-controls">
+      <button class="map-control-btn active" id="route-btn" onclick="toggleRoute()">🚗 Vet route</button>
+      <button class="map-control-btn" id="zone-btn" onclick="toggleZones()">⭕ Treatment zones</button>
+    </div>
+    <div class="map-stats">
+      <div class="map-stat"><div class="map-stat-val" id="stat-compliant">4</div><div class="map-stat-label">Compliant</div></div>
+      <div class="map-stat"><div class="map-stat-val" id="stat-warn" style="color:#b45309">2</div><div class="map-stat-label">Withdrawal</div></div>
+      <div class="map-stat"><div class="map-stat-val" id="stat-alert" style="color:#991b1b">1</div><div class="map-stat-label">Attention</div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const farms = [
+  {
+    id: 1, name: "Rooiberg Dairy", lat: -33.42, lng: 18.35, status: "ok",
+    herd: "280 dairy cows", next_visit: "Tue 25 Mar", vet: "Dr Van der Merwe",
+    district: "Darling", last_order: "1 Mar 2026",
+    drugs: [
+      { name: "Pen & Strep 100ml", qty: "4 x 100ml", date: "1 Mar", withdrawal: null },
+      { name: "Oxytocin 10ml", qty: "2 x 10ml", date: "1 Mar", withdrawal: null },
+      { name: "Terramycin LA", qty: "1 x 250ml", date: "1 Mar", withdrawal: "Milk 5 days · Meat 28 days" }
+    ]
+  },
+  {
+    id: 2, name: "Klein Zout Boerdery", lat: -33.28, lng: 18.48, status: "warn",
+    herd: "160 dairy cows · 40 sheep", next_visit: "Wed 26 Mar", vet: "Dr Bosman",
+    district: "Yzerfontein surrounds", last_order: "15 Feb 2026",
+    drugs: [
+      { name: "Mastiplan LC", qty: "12 tubes", date: "18 Feb", withdrawal: "⚠ Milk 72hrs — ACTIVE" },
+      { name: "Dexamethasone", qty: "3 x 50ml", date: "18 Feb", withdrawal: null }
+    ]
+  },
+  {
+    id: 3, name: "Morgenster Plaas", lat: -33.55, lng: 18.28, status: "ok",
+    herd: "420 dairy cows", next_visit: "Thu 27 Mar", vet: "Dr Van der Merwe",
+    district: "Malmesbury", last_order: "1 Mar 2026",
+    drugs: [
+      { name: "Oxymycin 200", qty: "2 x 500ml", date: "1 Mar", withdrawal: null },
+      { name: "Multimin 500ml", qty: "1 x 500ml", date: "1 Mar", withdrawal: null }
+    ]
+  },
+  {
+    id: 4, name: "De Hoek Veeplaas", lat: -33.48, lng: 18.55, status: "alert",
+    herd: "310 dairy cows", next_visit: "Mon 24 Mar", vet: "Unassigned",
+    district: "Darling East", last_order: "Not submitted",
+    drugs: []
+  },
+  {
+    id: 5, name: "Swartland Skape", lat: -33.32, lng: 18.22, status: "ok",
+    herd: "800 merino sheep", next_visit: "Fri 28 Mar", vet: "Dr Bosman",
+    district: "Moorreesburg", last_order: "1 Mar 2026",
+    drugs: [
+      { name: "Ivomec Injection", qty: "2 x 500ml", date: "1 Mar", withdrawal: null },
+      { name: "Multivitamin", qty: "1L", date: "1 Mar", withdrawal: null }
+    ]
+  },
+  {
+    id: 6, name: "Rypveld Dairy", lat: -33.62, lng: 18.42, status: "warn",
+    herd: "195 dairy cows", next_visit: "Tue 25 Mar", vet: "Dr Van der Merwe",
+    district: "Durbanville surrounds", last_order: "22 Feb 2026",
+    drugs: [
+      { name: "Calcium Borogluconate", qty: "6 x 400ml", date: "22 Feb", withdrawal: null },
+      { name: "Oxytocin", qty: "2 x 10ml", date: "22 Feb", withdrawal: "⚠ Monitoring — post-calving" }
+    ]
+  }
+];
+
+const colors = { ok: "#166534", warn: "#b45309", alert: "#991b1b" };
+let currentFilter = 'all';
+let showRoute = true;
+let showZones = false;
+let routeLayer, zoneLayer;
+let markers = {};
+let activeLayer = 'topo';
+
+// Map init
+const map = L.map('main-map', { zoomControl: true }).setView([-33.42, 18.38], 10);
+
+const tileLayers = {
+  topo: L.tileLayer('https://tile.opentopomap.org/{z}/{x}/{y}.png', { attribution: '© OpenTopoMap', maxZoom: 15 }),
+  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 17 }),
+  intel: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 17 })
+};
+tileLayers.topo.addTo(map);
+
+function setLayer(layer) {
+  Object.values(tileLayers).forEach(l => map.removeLayer(l));
+  tileLayers[layer].addTo(map);
+  activeLayer = layer;
+  document.querySelectorAll('.map-tab').forEach((t,i) => t.classList.toggle('active', ['topo','satellite','intel'][i] === layer));
+  if (layer === 'intel') renderZones(); else if (zoneLayer) map.removeLayer(zoneLayer);
+}
+
+// Render farms
+function renderFarmList() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const list = document.getElementById('farm-list');
+  list.innerHTML = '';
+  farms.forEach(f => {
+    if (currentFilter !== 'all' && f.status !== currentFilter) return;
+    if (search && !f.name.toLowerCase().includes(search)) return;
+    const div = document.createElement('div');
+    div.className = 'farm-item';
+    div.id = `farm-item-${f.id}`;
+    const tagText = { ok: 'Compliant', warn: 'Withdrawal active', alert: 'Attention needed' };
+    div.innerHTML = `
+      <div class="farm-dot" style="background:${colors[f.status]}"></div>
+      <div>
+        <div class="farm-item-name">${f.name}</div>
+        <div class="farm-item-meta">${f.herd} · ${f.district}</div>
+        <div class="farm-item-meta">Next visit: ${f.next_visit} · ${f.vet}</div>
+        <span class="farm-item-tag tag-${f.status}">${tagText[f.status]}</span>
+      </div>`;
+    div.onclick = () => selectFarm(f);
+    list.appendChild(div);
+  });
+}
+
+function createMarkerIcon(status) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="width:16px;height:16px;border-radius:50%;background:${colors[status]};border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.25)"></div>`,
+    iconSize: [16, 16], iconAnchor: [8, 8]
+  });
+}
+
+farms.forEach(f => {
+  const marker = L.marker([f.lat, f.lng], { icon: createMarkerIcon(f.status) }).addTo(map);
+  marker.on('click', () => selectFarm(f));
+  markers[f.id] = marker;
+});
+
+function selectFarm(farm) {
+  document.querySelectorAll('.farm-item').forEach(el => el.classList.remove('selected'));
+  const item = document.getElementById(`farm-item-${farm.id}`);
+  if (item) item.classList.add('selected');
+  map.flyTo([farm.lat, farm.lng], 13, { duration: 0.8 });
+
+  const tagText = { ok: 'Compliant', warn: 'Withdrawal active', alert: 'Attention needed' };
+  document.getElementById('detail-name').textContent = farm.name;
+  document.getElementById('detail-sub').textContent = `${farm.district} · ${farm.herd}`;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="detail-section">
+      <div class="detail-section-title">Farm details</div>
+      <div class="detail-row"><span class="detail-row-label">Status</span><span class="farm-item-tag tag-${farm.status}">${tagText[farm.status]}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Next vet visit</span><span class="detail-row-val">${farm.next_visit}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Assigned vet</span><span class="detail-row-val">${farm.vet}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Last order</span><span class="detail-row-val">${farm.last_order}</span></div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Active medicines</div>
+      ${farm.drugs.length === 0 ? '<p style="font-size:12px;color:#7a8a7a">No order on file — contact farm</p>' :
+        farm.drugs.map(d => `
+          <div class="drug-row">
+            <div class="drug-name">${d.name}</div>
+            <div class="drug-meta">${d.qty} · Dispensed ${d.date}</div>
+            ${d.withdrawal ? `<div class="withdrawal-badge">${d.withdrawal}</div>` : ''}
+          </div>`).join('')}
+    </div>`;
+  document.getElementById('detail-panel').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+  document.querySelectorAll('.farm-item').forEach(el => el.classList.remove('selected'));
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderFarmList();
+}
+
+function filterFarms() { renderFarmList(); }
+
+// Route
+function renderRoute() {
+  if (routeLayer) map.removeLayer(routeLayer);
+  if (!showRoute) return;
+  const coords = farms.map(f => [f.lat, f.lng]);
+  routeLayer = L.polyline(coords, { color: '#2d5c2d', weight: 2.5, dashArray: '8,5', opacity: 0.7 }).addTo(map);
+}
+
+function toggleRoute() {
+  showRoute = !showRoute;
+  document.getElementById('route-btn').classList.toggle('active', showRoute);
+  renderRoute();
+}
+
+function renderZones() {
+  if (zoneLayer) map.removeLayer(zoneLayer);
+  zoneLayer = L.layerGroup(farms.map(f =>
+    L.circle([f.lat, f.lng], {
+      radius: f.status === 'warn' ? 9000 : f.status === 'alert' ? 6000 : 4000,
+      color: colors[f.status], fillColor: colors[f.status],
+      fillOpacity: 0.15, weight: 1.5, dashArray: f.status === 'ok' ? '4,4' : null
+    })
+  )).addTo(map);
+}
+
+function toggleZones() {
+  showZones = !showZones;
+  document.getElementById('zone-btn').classList.toggle('active', showZones);
+  if (showZones) renderZones(); else if (zoneLayer) map.removeLayer(zoneLayer);
+}
+
+renderFarmList();
+renderRoute();
+</script>
+</body>
+</html>

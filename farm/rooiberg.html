@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rooiberg Dairy — VeldRx</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --green-dark: #1e3a1e; --green-mid: #2d5c2d; --green-light: #4a8c4a;
+      --green-pale: #e8f0e8; --white: #fff; --grey-light: #f7f8f6;
+      --grey-mid: #e2e8e2; --text-dark: #1a2418; --text-mid: #4a5a4a; --text-light: #7a8a7a;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--grey-light); }
+    nav {
+      background: white; border-bottom: 1px solid var(--grey-mid);
+      display: flex; align-items: center; gap: 16px; padding: 0 32px; height: 56px; position: sticky; top: 0; z-index: 100;
+    }
+    .nav-back { font-size: 13px; color: var(--text-light); text-decoration: none; }
+    .nav-back:hover { color: var(--green-dark); }
+    .nav-sep { color: var(--grey-mid); }
+    .nav-curr { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+    .nav-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; margin-left: auto; }
+    .nav-logo-mark { width: 26px; height: 26px; background: var(--green-dark); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: white; font-weight: 700; }
+    .nav-logo-text { font-size: 14px; font-weight: 700; color: var(--green-dark); }
+
+    .page { max-width: 1100px; margin: 0 auto; padding: 32px 32px 80px; }
+
+    .farm-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
+    .farm-name { font-size: 30px; font-weight: 700; color: var(--green-dark); letter-spacing: -0.5px; }
+    .farm-meta { font-size: 14px; color: var(--text-light); margin-top: 4px; }
+    .farm-badge { display: inline-flex; align-items: center; gap: 6px; background: #dcfce7; color: #166534; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 8px; }
+    .header-actions { display: flex; gap: 10px; }
+    .btn { padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; border: none; font-family: 'Inter', sans-serif; }
+    .btn-outline { background: white; color: var(--text-dark); border: 1.5px solid var(--grey-mid); }
+    .btn-primary { background: var(--green-dark); color: white; }
+
+    .grid-top { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+    .metric-card { background: white; border-radius: 12px; padding: 20px 22px; border: 1px solid var(--grey-mid); }
+    .metric-label { font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .metric-val { font-size: 26px; font-weight: 700; color: var(--green-dark); }
+    .metric-sub { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+
+    .grid-main { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .card { background: white; border-radius: 12px; padding: 24px; border: 1px solid var(--grey-mid); }
+    .card-title { font-size: 13px; font-weight: 700; color: var(--text-dark); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .card-title a { font-size: 12px; font-weight: 500; color: var(--green-mid); text-decoration: none; }
+
+    .map-card { height: 260px; border-radius: 12px; overflow: hidden; border: 1px solid var(--grey-mid); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { font-size: 10px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 12px; text-align: left; background: var(--grey-light); border-radius: 4px; }
+    tbody td { padding: 12px 12px; border-bottom: 1px solid var(--grey-mid); color: var(--text-mid); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--grey-light); }
+    .status-pill { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+    .pill-ok { background: #dcfce7; color: #166534; }
+    .pill-warn { background: #fef9c3; color: #854d0e; }
+
+    .visit-item { display: flex; gap: 14px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--grey-mid); }
+    .visit-item:last-child { border-bottom: none; }
+    .visit-date { font-size: 11px; font-weight: 700; color: var(--text-light); width: 60px; flex-shrink: 0; text-align: right; padding-top: 1px; }
+    .visit-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green-light); flex-shrink: 0; margin-top: 4px; }
+    .visit-title { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+    .visit-sub { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
+    .grid-bottom { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="../map.html" class="nav-back">← Farm Map</a>
+  <span class="nav-sep">/</span>
+  <span class="nav-curr">Rooiberg Dairy</span>
+  <a href="../index.html" class="nav-logo">
+    <div class="nav-logo-mark">V</div>
+    <div class="nav-logo-text">VeldRx</div>
+  </a>
+</nav>
+
+<div class="page">
+  <div class="farm-header">
+    <div>
+      <div class="farm-name">Rooiberg Dairy</div>
+      <div class="farm-meta">Darling district · The Animal Hospital · Dr Van der Merwe</div>
+      <div class="farm-badge">✓ Compliant — all records up to date</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline">Export records</button>
+      <button class="btn btn-primary">+ Log dispensing</button>
+    </div>
+  </div>
+
+  <div class="grid-top">
+    <div class="metric-card">
+      <div class="metric-label">Herd size</div>
+      <div class="metric-val">280</div>
+      <div class="metric-sub">Dairy cows · Friesian/Holstein</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Next vet visit</div>
+      <div class="metric-val" style="font-size:18px">Tue 25 Mar</div>
+      <div class="metric-sub">Dr Van der Merwe · Routine herd</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Withdrawal periods</div>
+      <div class="metric-val" style="color:#166534">0 active</div>
+      <div class="metric-sub">All milk & meat clear</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Last order</div>
+      <div class="metric-val" style="font-size:18px">1 Mar 2026</div>
+      <div class="metric-sub">R4,280 · 6 products</div>
+    </div>
+  </div>
+
+  <div class="grid-main">
+    <div class="card">
+      <div class="card-title">Current medicine dispensing log <a href="#">View full register →</a></div>
+      <table>
+        <thead><tr><th>Product</th><th>Qty</th><th>Dispensed</th><th>Batch</th><th>Withdrawal</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Pen & Strep 100ml</strong></td><td>4 × 100ml</td><td>1 Mar</td><td>AH-2603-01</td><td><span class="status-pill pill-ok">None</span></td></tr>
+          <tr><td><strong>Oxytocin 10ml</strong></td><td>2 × 10ml</td><td>1 Mar</td><td>AH-2603-02</td><td><span class="status-pill pill-ok">None</span></td></tr>
+          <tr><td><strong>Terramycin LA</strong></td><td>1 × 250ml</td><td>1 Mar</td><td>AH-2603-03</td><td><span class="status-pill pill-ok">Cleared 8 Mar</span></td></tr>
+          <tr><td><strong>Multimin 500ml</strong></td><td>1 × 500ml</td><td>1 Mar</td><td>AH-2603-04</td><td><span class="status-pill pill-ok">None</span></td></tr>
+          <tr><td><strong>Calcium Borogluconate</strong></td><td>3 × 400ml</td><td>1 Mar</td><td>AH-2603-05</td><td><span class="status-pill pill-ok">None</span></td></tr>
+          <tr><td><strong>Ivomec Injection</strong></td><td>1 × 500ml</td><td>1 Mar</td><td>AH-2603-06</td><td><span class="status-pill pill-ok">None</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="farm-map" class="map-card"></div>
+  </div>
+
+  <div class="grid-bottom">
+    <div class="card">
+      <div class="card-title">Visit history</div>
+      <div class="visit-item">
+        <div class="visit-date">1 Mar</div>
+        <div class="visit-dot"></div>
+        <div><div class="visit-title">Monthly herd visit · Dr Van der Merwe</div><div class="visit-sub">Routine check · 3 treated for mastitis · Terramycin LA dispensed · withdrawal now cleared</div></div>
+      </div>
+      <div class="visit-item">
+        <div class="visit-date">1 Feb</div>
+        <div class="visit-dot"></div>
+        <div><div class="visit-title">Monthly herd visit · Dr Van der Merwe</div><div class="visit-sub">No treatments required · Multivitamin boost administered · all clear</div></div>
+      </div>
+      <div class="visit-item">
+        <div class="visit-date">15 Jan</div>
+        <div class="visit-dot"></div>
+        <div><div class="visit-title">Emergency call-out · Dr Bosman</div><div class="visit-sub">2 x calving complications · Oxytocin administered · all recovered</div></div>
+      </div>
+      <div class="visit-item">
+        <div class="visit-date">3 Jan</div>
+        <div class="visit-dot"></div>
+        <div><div class="visit-title">Monthly herd visit · Dr Van der Merwe</div><div class="visit-sub">Routine check · TB test administered (negative) · compliant</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Compliance status</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:#dcfce7;border-radius:8px;padding:12px 14px">
+          <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px">Scheduled drug register</div>
+          <div style="font-size:14px;font-weight:700;color:#166534;margin-top:4px">✓ Up to date</div>
+          <div style="font-size:11px;color:#166534;opacity:0.8;margin-top:2px">Last updated 1 Mar 2026</div>
+        </div>
+        <div style="background:#dcfce7;border-radius:8px;padding:12px 14px">
+          <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px">Withdrawal periods</div>
+          <div style="font-size:14px;font-weight:700;color:#166534;margin-top:4px">✓ All clear</div>
+          <div style="font-size:11px;color:#166534;opacity:0.8;margin-top:2px">Milk & meat — no restrictions</div>
+        </div>
+        <div style="background:#dcfce7;border-radius:8px;padding:12px 14px">
+          <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px">DALRRD register</div>
+          <div style="font-size:14px;font-weight:700;color:#166534;margin-top:4px">✓ Ready to export</div>
+          <div style="font-size:11px;color:#166534;opacity:0.8;margin-top:2px"><a href="#" style="color:#166534">Download PDF report →</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const map = L.map('farm-map', { zoomControl: false, scrollWheelZoom: false, dragging: false }).setView([-33.42, 18.35], 13);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri', maxZoom: 17 }).addTo(map);
+  const icon = L.divIcon({
+    className: '',
+    html: '<div style="width:16px;height:16px;border-radius:50%;background:#166534;border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)"></div>',
+    iconSize: [16,16], iconAnchor: [8,8]
+  });
+  L.marker([-33.42, 18.35], { icon }).addTo(map);
+  L.circle([-33.42, 18.35], { radius: 1200, color: '#166534', fillColor: '#166534', fillOpacity: 0.1, weight: 1.5 }).addTo(map);
+</script>
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VeldRx — Farm & Vet Intelligence Platform</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --green-dark: #1e3a1e;
+      --green-mid: #2d5c2d;
+      --green-light: #4a8c4a;
+      --green-pale: #e8f0e8;
+      --earth: #8b6914;
+      --earth-light: #f5f0e8;
+      --white: #ffffff;
+      --grey-light: #f7f8f6;
+      --grey-mid: #e2e8e2;
+      --text-dark: #1a2418;
+      --text-mid: #4a5a4a;
+      --text-light: #7a8a7a;
+      --accent: #3d7a3d;
+    }
+    body { font-family: 'Inter', sans-serif; color: var(--text-dark); background: var(--white); }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--grey-mid);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px; height: 60px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-mark {
+      width: 32px; height: 32px; background: var(--green-dark);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: white; font-weight: 700;
+    }
+    .nav-logo-text { font-size: 18px; font-weight: 700; color: var(--green-dark); letter-spacing: -0.3px; }
+    .nav-logo-sub { font-size: 11px; color: var(--text-light); margin-top: 1px; }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a { text-decoration: none; color: var(--text-mid); font-size: 14px; font-weight: 500; }
+    .nav-links a:hover { color: var(--green-dark); }
+    .nav-cta {
+      background: var(--green-dark); color: white; padding: 8px 20px;
+      border-radius: 6px; font-size: 13px; font-weight: 600;
+      text-decoration: none; transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--green-mid); color: white; }
+
+    /* HERO */
+    .hero {
+      margin-top: 60px; height: calc(100vh - 60px);
+      display: grid; grid-template-columns: 1fr 1fr;
+    }
+    .hero-left {
+      padding: 80px 60px; display: flex; flex-direction: column;
+      justify-content: center; background: var(--white);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--green-pale); color: var(--green-mid);
+      padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+      margin-bottom: 24px; width: fit-content;
+    }
+    .hero-badge::before { content: '●'; font-size: 8px; }
+    h1 {
+      font-size: 48px; font-weight: 700; line-height: 1.1;
+      color: var(--green-dark); letter-spacing: -1px; margin-bottom: 20px;
+    }
+    h1 span { color: var(--green-light); }
+    .hero-sub {
+      font-size: 18px; color: var(--text-mid); line-height: 1.6;
+      margin-bottom: 40px; max-width: 440px;
+    }
+    .hero-actions { display: flex; gap: 12px; align-items: center; }
+    .btn-primary {
+      background: var(--green-dark); color: white; padding: 14px 28px;
+      border-radius: 8px; font-size: 15px; font-weight: 600;
+      text-decoration: none; transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--green-mid); }
+    .btn-secondary {
+      background: transparent; color: var(--green-dark); padding: 14px 28px;
+      border-radius: 8px; font-size: 15px; font-weight: 600;
+      text-decoration: none; border: 1.5px solid var(--grey-mid);
+      transition: border-color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--green-light); }
+    .hero-stats {
+      display: flex; gap: 32px; margin-top: 48px;
+      padding-top: 40px; border-top: 1px solid var(--grey-mid);
+    }
+    .stat-val { font-size: 28px; font-weight: 700; color: var(--green-dark); }
+    .stat-label { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
+    .hero-right { position: relative; }
+    #hero-map { width: 100%; height: 100%; }
+    .map-overlay {
+      position: absolute; top: 20px; left: 20px; z-index: 500;
+      background: white; border-radius: 10px; padding: 14px 18px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    }
+    .map-overlay-title { font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+    .map-overlay-val { font-size: 22px; font-weight: 700; color: var(--green-dark); margin-top: 2px; }
+    .map-overlay-sub { font-size: 12px; color: var(--text-mid); }
+    .legend {
+      position: absolute; bottom: 20px; left: 20px; z-index: 500;
+      background: white; border-radius: 8px; padding: 10px 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 6px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-mid); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* PROBLEM STRIP */
+    .strip {
+      background: var(--green-dark); color: white;
+      padding: 48px 80px; display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 40px;
+    }
+    .strip-item { }
+    .strip-num { font-size: 36px; font-weight: 700; color: #7bc47b; }
+    .strip-label { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 4px; line-height: 1.5; }
+
+    /* TIERS */
+    .tiers { padding: 100px 80px; background: var(--grey-light); }
+    .section-label { font-size: 12px; font-weight: 600; color: var(--green-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .section-title { font-size: 36px; font-weight: 700; color: var(--green-dark); letter-spacing: -0.5px; margin-bottom: 12px; }
+    .section-sub { font-size: 16px; color: var(--text-mid); margin-bottom: 60px; max-width: 560px; }
+    .tier-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+    .tier-card {
+      background: white; border-radius: 14px; padding: 36px 32px;
+      border: 1.5px solid var(--grey-mid); transition: border-color 0.2s;
+    }
+    .tier-card:hover { border-color: var(--green-light); }
+    .tier-card.featured { border-color: var(--green-dark); position: relative; }
+    .tier-badge {
+      position: absolute; top: -12px; left: 28px;
+      background: var(--green-dark); color: white; font-size: 11px;
+      font-weight: 700; padding: 3px 10px; border-radius: 20px;
+    }
+    .tier-num { font-size: 12px; font-weight: 700; color: var(--green-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .tier-name { font-size: 22px; font-weight: 700; color: var(--green-dark); margin-bottom: 8px; }
+    .tier-price { font-size: 14px; color: var(--text-light); margin-bottom: 20px; }
+    .tier-price strong { font-size: 24px; color: var(--text-dark); font-weight: 700; }
+    .tier-desc { font-size: 14px; color: var(--text-mid); line-height: 1.6; margin-bottom: 24px; }
+    .tier-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .tier-feature { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text-mid); }
+    .tier-feature::before { content: '✓'; color: var(--green-light); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .tier-cta {
+      display: block; text-align: center; padding: 12px;
+      border-radius: 8px; font-size: 14px; font-weight: 600;
+      text-decoration: none; background: var(--green-pale); color: var(--green-dark);
+      transition: background 0.2s;
+    }
+    .tier-card.featured .tier-cta { background: var(--green-dark); color: white; }
+    .tier-cta:hover { opacity: 0.85; }
+
+    /* HOW IT WORKS */
+    .how { padding: 100px 80px; }
+    .how-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-top: 60px; }
+    .how-map { height: 480px; border-radius: 16px; overflow: hidden; border: 1px solid var(--grey-mid); }
+    .how-steps { display: flex; flex-direction: column; gap: 32px; }
+    .how-step { display: flex; gap: 20px; }
+    .how-step-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--green-pale); color: var(--green-dark);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; flex-shrink: 0;
+    }
+    .how-step-title { font-size: 16px; font-weight: 600; color: var(--green-dark); margin-bottom: 6px; }
+    .how-step-desc { font-size: 14px; color: var(--text-mid); line-height: 1.6; }
+
+    /* DISEASE INTELLIGENCE */
+    .intel { padding: 100px 80px; background: var(--green-dark); color: white; }
+    .intel .section-title { color: white; }
+    .intel .section-sub { color: rgba(255,255,255,0.7); }
+    .intel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+    .intel-map { height: 420px; border-radius: 16px; overflow: hidden; }
+    .intel-cards { display: flex; flex-direction: column; gap: 16px; }
+    .intel-card {
+      background: rgba(255,255,255,0.08); border-radius: 10px;
+      padding: 20px 24px; border: 1px solid rgba(255,255,255,0.12);
+    }
+    .intel-card-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .intel-card-val { font-size: 20px; font-weight: 700; color: #7bc47b; }
+    .intel-card-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+    .trend-up { color: #f87171; }
+    .trend-stable { color: #7bc47b; }
+
+    /* CTA SECTION */
+    .cta-section { padding: 100px 80px; text-align: center; background: var(--earth-light); }
+    .cta-section h2 { font-size: 40px; font-weight: 700; color: var(--green-dark); margin-bottom: 16px; letter-spacing: -0.5px; }
+    .cta-section p { font-size: 18px; color: var(--text-mid); margin-bottom: 40px; }
+    .cta-actions { display: flex; gap: 16px; justify-content: center; }
+
+    /* FOOTER */
+    footer {
+      background: var(--green-dark); color: rgba(255,255,255,0.6);
+      padding: 40px 80px; display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px;
+    }
+    footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
+    footer a:hover { color: white; }
+
+    /* POPUP */
+    .leaflet-popup-content-wrapper { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+    .farm-popup h4 { font-size: 14px; font-weight: 700; color: var(--green-dark); margin-bottom: 8px; }
+    .farm-popup .status { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-bottom: 8px; }
+    .farm-popup .status.ok { background: #dcfce7; color: #166534; }
+    .farm-popup .status.warn { background: #fef9c3; color: #854d0e; }
+    .farm-popup .status.alert { background: #fee2e2; color: #991b1b; }
+    .farm-popup p { font-size: 12px; color: #4a5a4a; margin: 3px 0; }
+    .farm-popup a { font-size: 12px; color: var(--green-mid); font-weight: 600; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">V</div>
+    <div>
+      <div class="nav-logo-text">VeldRx</div>
+      <div class="nav-logo-sub">Farm & Vet Intelligence</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="map.html">Farm Map</a>
+    <a href="#tiers">Tiers</a>
+    <a href="#how">How It Works</a>
+    <a href="#intel">Disease Intel</a>
+    <a href="map.html" class="nav-cta">Open Platform →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-badge">Now live — Western Cape pilot</div>
+    <h1>Where <span>veld knowledge</span> meets veterinary compliance</h1>
+    <p class="hero-sub">VeldRx connects farms, vets and regulators on a single platform — tracking medicines, scheduling visits, and surfacing disease patterns before they become outbreaks.</p>
+    <div class="hero-actions">
+      <a href="map.html" class="btn-primary">View Farm Map →</a>
+      <a href="#tiers" class="btn-secondary">See how it works</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-val">35k+</div>
+        <div class="stat-label">Commercial farms<br>in South Africa</div>
+      </div>
+      <div>
+        <div class="stat-val">R0</div>
+        <div class="stat-label">Dedicated digital<br>compliance tools</div>
+      </div>
+      <div>
+        <div class="stat-val">100%</div>
+        <div class="stat-label">Scheduled drug<br>compliance required</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div id="hero-map"></div>
+    <div class="map-overlay">
+      <div class="map-overlay-title">The Animal Hospital</div>
+      <div class="map-overlay-val">6 farms</div>
+      <div class="map-overlay-sub">Darling / Swartland corridor</div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#166534"></div> Compliant</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#b45309"></div> Withdrawal active</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#991b1b"></div> Attention needed</div>
+    </div>
+  </div>
+</section>
+
+<!-- STRIP -->
+<div class="strip">
+  <div class="strip-item">
+    <div class="strip-num">9 years</div>
+    <div class="strip-label">The average practice has been managing farm medicine records manually</div>
+  </div>
+  <div class="strip-item">
+    <div class="strip-num">0 tools</div>
+    <div class="strip-label">Dedicated digital platforms exist for SA large-animal vet practices</div>
+  </div>
+  <div class="strip-item">
+    <div class="strip-num">Growing</div>
+    <div class="strip-label">Regulatory pressure from DALRRD and EU export traceability requirements</div>
+  </div>
+</div>
+
+<!-- TIERS -->
+<section class="tiers" id="tiers">
+  <div class="section-label">Platform</div>
+  <div class="section-title">Three ways in</div>
+  <div class="section-sub">Farms, vet practices and regulators each get the layer that's right for them.</div>
+  <div class="tier-grid">
+    <div class="tier-card">
+      <div class="tier-num">T1 · Scout</div>
+      <div class="tier-name">Farm Profile</div>
+      <div class="tier-price"><strong>Free</strong> forever</div>
+      <div class="tier-desc">Get your farm on the map. Basic herd profile, medicine log, and vet connection — no cost, no commitment.</div>
+      <div class="tier-features">
+        <div class="tier-feature">Farm profile & herd info</div>
+        <div class="tier-feature">Basic dispensing log</div>
+        <div class="tier-feature">Vet visit history</div>
+        <div class="tier-feature">Connect to your practice</div>
+      </div>
+      <a href="map.html" class="tier-cta">Get started free</a>
+    </div>
+    <div class="tier-card featured">
+      <div class="tier-badge">Most popular</div>
+      <div class="tier-num">T2 · Connect</div>
+      <div class="tier-name">Practice Platform</div>
+      <div class="tier-price"><strong>R850</strong> / practice / month</div>
+      <div class="tier-desc">The full compliance and operations platform for vet practices managing multiple farms. Scheduled drug register, withdrawal tracking, visit routing.</div>
+      <div class="tier-features">
+        <div class="tier-feature">Full dispensing & drug register</div>
+        <div class="tier-feature">Withdrawal period tracker</div>
+        <div class="tier-feature">Vet visit routing & scheduling</div>
+        <div class="tier-feature">Monthly order management</div>
+        <div class="tier-feature">One-click DALRRD compliance reports</div>
+        <div class="tier-feature">Farm portal access for clients</div>
+      </div>
+      <a href="#" class="tier-cta">Start pilot</a>
+    </div>
+    <div class="tier-card">
+      <div class="tier-num">T3 · Intelligence</div>
+      <div class="tier-name">Regional Intel</div>
+      <div class="tier-price"><strong>R2,400</strong> / month</div>
+      <div class="tier-desc">Aggregate disease surveillance across your region. See treatment patterns before they become outbreaks. Designed for multi-practice groups and regulatory bodies.</div>
+      <div class="tier-features">
+        <div class="tier-feature">Regional disease heatmap</div>
+        <div class="tier-feature">Antibiotic usage trends</div>
+        <div class="tier-feature">Outbreak early warning</div>
+        <div class="tier-feature">DALRRD regulatory feed</div>
+        <div class="tier-feature">Export traceability (EU/UK)</div>
+      </div>
+      <a href="#" class="tier-cta">Request access</a>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-label">How it works</div>
+  <div class="section-title">From farm gate to compliance report</div>
+  <div class="section-sub">Every medicine that leaves a practice, every farm visit, every scheduled drug — tracked, reconciled, and ready for inspection.</div>
+  <div class="how-grid">
+    <div id="how-map" class="how-map"></div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step-num">1</div>
+        <div>
+          <div class="how-step-title">Farm places monthly order</div>
+          <div class="how-step-desc">Farms submit their medicine order through their portal. The practice reviews, approves, and dispatches — all logged automatically.</div>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">2</div>
+        <div>
+          <div class="how-step-title">Vet visits, medicines dispensed</div>
+          <div class="how-step-desc">Herd visit records, treatments administered, and withdrawal periods are captured in the field or back at the practice. Batch numbers tracked throughout.</div>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">3</div>
+        <div>
+          <div class="how-step-title">Withdrawal alerts fire automatically</div>
+          <div class="how-step-desc">When an animal or batch is in a withdrawal period, the farm and vet are both alerted. Milk and meat safety protected without manual tracking.</div>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">4</div>
+        <div>
+          <div class="how-step-title">Compliance reports, one click</div>
+          <div class="how-step-desc">Monthly scheduled drug register, ready for DALRRD inspection. Full audit trail. No paperwork.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DISEASE INTELLIGENCE -->
+<section class="intel" id="intel">
+  <div class="intel-grid">
+    <div>
+      <div class="section-label" style="color:#7bc47b">T3 · Intelligence Layer</div>
+      <div class="section-title">See what's moving across the veld</div>
+      <div class="section-sub">When every practice logs what they're treating, patterns emerge. Mastitis cluster in the Darling corridor. Respiratory spike post-rain. The data was always there — now it's visible.</div>
+      <div class="intel-cards">
+        <div class="intel-card">
+          <div class="intel-card-label">This week · Swartland region</div>
+          <div class="intel-card-val">↑ Mastitis treatments <span class="trend-up">+34%</span></div>
+          <div class="intel-card-sub">4 farms, 3 practices · Possibly linked to recent heat event</div>
+        </div>
+        <div class="intel-card">
+          <div class="intel-card-label">Antibiotic usage · Rolling 30d</div>
+          <div class="intel-card-val"><span class="trend-stable">Stable</span> — within benchmark</div>
+          <div class="intel-card-sub">6 practices reporting · DALRRD threshold: within limits</div>
+        </div>
+        <div class="intel-card">
+          <div class="intel-card-label">Active withdrawal periods</div>
+          <div class="intel-card-val">3 farms <span style="color:rgba(255,255,255,0.5);font-size:14px">/ 6 in region</span></div>
+          <div class="intel-card-sub">All flagged · No milk or meat at risk</div>
+        </div>
+      </div>
+    </div>
+    <div id="intel-map" class="intel-map"></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Ready to bring your practice onto the map?</h2>
+  <p>Join the Western Cape pilot. Free for farms. Simple setup for practices.</p>
+  <div class="cta-actions">
+    <a href="map.html" class="btn-primary">View live demo →</a>
+    <a href="mailto:hello@veldrx.co.za" class="btn-secondary">Get in touch</a>
+  </div>
+</section>
+
+<footer>
+  <div>© 2026 VeldRx · Connecting South Africa's farms and vets</div>
+  <div style="display:flex;gap:24px">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="mailto:hello@veldrx.co.za">hello@veldrx.co.za</a>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // Farm data — hypothetical, The Animal Hospital, Darling area
+  const farms = [
+    { name: "Rooiberg Dairy", lat: -33.42, lng: 18.35, status: "ok", herd: "280 dairy cows", treatment: "None active", next_visit: "Tue 25 Mar" },
+    { name: "Klein Zout Boerdery", lat: -33.28, lng: 18.48, status: "warn", herd: "160 dairy / 40 sheep", treatment: "Mastitis — withdrawal active", next_visit: "Wed 26 Mar" },
+    { name: "Morgenster Plaas", lat: -33.55, lng: 18.28, status: "ok", herd: "420 dairy cows", treatment: "None active", next_visit: "Thu 27 Mar" },
+    { name: "De Hoek Veeplaas", lat: -33.48, lng: 18.55, status: "alert", herd: "310 dairy cows", treatment: "Order overdue — review needed", next_visit: "Mon 24 Mar" },
+    { name: "Swartland Skape", lat: -33.32, lng: 18.22, status: "ok", herd: "800 merino sheep", treatment: "None active", next_visit: "Fri 28 Mar" },
+    { name: "Rypveld Dairy", lat: -33.62, lng: 18.42, status: "warn", herd: "195 dairy cows", treatment: "Post-calving — monitoring", next_visit: "Tue 25 Mar" },
+  ];
+
+  const colors = { ok: "#166534", warn: "#b45309", alert: "#991b1b" };
+
+  function createMarker(farm) {
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:14px;height:14px;border-radius:50%;background:${colors[farm.status]};border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3)"></div>`,
+      iconSize: [14, 14], iconAnchor: [7, 7]
+    });
+    const popup = `
+      <div class="farm-popup">
+        <h4>${farm.name}</h4>
+        <span class="status ${farm.status}">${farm.status === 'ok' ? 'Compliant' : farm.status === 'warn' ? 'Withdrawal active' : 'Attention needed'}</span>
+        <p>🐄 ${farm.herd}</p>
+        <p>💊 ${farm.treatment}</p>
+        <p>📅 Next visit: ${farm.next_visit}</p>
+        <br><a href="farm/rooiberg.html">View full profile →</a>
+      </div>`;
+    return L.marker([farm.lat, farm.lng], { icon }).bindPopup(popup);
+  }
+
+  // Hero map
+  const heroMap = L.map('hero-map', { zoomControl: false, scrollWheelZoom: false }).setView([-33.42, 18.38], 10);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '© Esri', maxZoom: 17
+  }).addTo(heroMap);
+  farms.forEach(f => createMarker(f).addTo(heroMap));
+
+  // How map
+  const howMap = L.map('how-map', { zoomControl: false, scrollWheelZoom: false }).setView([-33.42, 18.38], 10);
+  L.tileLayer('https://tile.opentopomap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenTopoMap', maxZoom: 15
+  }).addTo(howMap);
+  farms.forEach(f => createMarker(f).addTo(howMap));
+
+  // Draw vet route line
+  const routeCoords = farms.filter(f => f.status !== 'alert').map(f => [f.lat, f.lng]);
+  L.polyline(routeCoords, { color: '#2d5c2d', weight: 2, dashArray: '6,4', opacity: 0.6 }).addTo(howMap);
+
+  // Intel map
+  const intelMap = L.map('intel-map', { zoomControl: false, scrollWheelZoom: false }).setView([-33.42, 18.38], 10);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '© Esri', maxZoom: 17
+  }).addTo(intelMap);
+  farms.forEach(f => {
+    const circle = L.circle([f.lat, f.lng], {
+      radius: f.status === 'warn' ? 8000 : f.status === 'alert' ? 6000 : 4000,
+      color: colors[f.status], fillColor: colors[f.status],
+      fillOpacity: 0.2, weight: 1.5
+    }).addTo(intelMap);
+    createMarker(f).addTo(intelMap);
+  });
+</script>
+</body>
+</html>
