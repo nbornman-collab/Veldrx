@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VeldRx — Farm & Vet Intelligence Platform</title>
+  <title>VeldRx — Act 101 Dispensing Control for Large-Animal Vet Practices</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
@@ -22,10 +22,10 @@
       --text-mid: #4a5a4a;
       --text-light: #7a8a7a;
       --accent: #3d7a3d;
+      --amber: #b45309;
+      --red: #991b1b;
     }
     body { font-family: 'Inter', sans-serif; color: var(--text-dark); background: var(--white); }
-
-    /* NAV */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
       background: rgba(255,255,255,0.96);
@@ -52,13 +52,12 @@
     }
     .nav-cta:hover { background: var(--green-mid); color: white; }
 
-    /* HERO */
     .hero {
-      margin-top: 60px; height: calc(100vh - 60px);
-      display: grid; grid-template-columns: 1fr 1fr;
+      margin-top: 60px; min-height: calc(100vh - 60px);
+      display: grid; grid-template-columns: 1.08fr 0.92fr;
     }
     .hero-left {
-      padding: 80px 60px; display: flex; flex-direction: column;
+      padding: 88px 60px; display: flex; flex-direction: column;
       justify-content: center; background: var(--white);
     }
     .hero-badge {
@@ -69,14 +68,18 @@
     }
     .hero-badge::before { content: '●'; font-size: 8px; }
     h1 {
-      font-size: 48px; font-weight: 700; line-height: 1.1;
-      color: var(--green-dark); letter-spacing: -1px; margin-bottom: 20px;
+      font-size: 50px; font-weight: 700; line-height: 1.04;
+      color: var(--green-dark); letter-spacing: -1.2px; margin-bottom: 22px;
+      max-width: 700px;
     }
     h1 span { color: var(--green-light); }
     .hero-sub {
-      font-size: 18px; color: var(--text-mid); line-height: 1.6;
-      margin-bottom: 40px; max-width: 440px;
+      font-size: 18px; color: var(--text-mid); line-height: 1.65;
+      margin-bottom: 28px; max-width: 560px;
     }
+    .hero-points { display: flex; flex-direction: column; gap: 10px; margin-bottom: 38px; }
+    .hero-point { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; color: var(--text-mid); line-height: 1.5; }
+    .hero-point::before { content: '✓'; color: var(--green-light); font-weight: 700; margin-top: 1px; }
     .hero-actions { display: flex; gap: 12px; align-items: center; }
     .btn-primary {
       background: var(--green-dark); color: white; padding: 14px 28px;
@@ -94,50 +97,91 @@
     .hero-stats {
       display: flex; gap: 32px; margin-top: 48px;
       padding-top: 40px; border-top: 1px solid var(--grey-mid);
+      flex-wrap: wrap;
     }
-    .stat-val { font-size: 28px; font-weight: 700; color: var(--green-dark); }
-    .stat-label { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+    .stat-val { font-size: 30px; font-weight: 700; color: var(--green-dark); }
+    .stat-label { font-size: 12px; color: var(--text-light); margin-top: 2px; line-height: 1.45; }
 
-    .hero-right { position: relative; }
-    #hero-map { width: 100%; height: 100%; }
-    .map-overlay {
-      position: absolute; top: 20px; left: 20px; z-index: 500;
-      background: white; border-radius: 10px; padding: 14px 18px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    .hero-right {
+      position: relative; background: linear-gradient(180deg, #f4f7f3 0%, #eef3ed 100%);
+      padding: 88px 44px; display: flex; align-items: center; justify-content: center;
     }
-    .map-overlay-title { font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
-    .map-overlay-val { font-size: 22px; font-weight: 700; color: var(--green-dark); margin-top: 2px; }
-    .map-overlay-sub { font-size: 12px; color: var(--text-mid); }
-    .legend {
-      position: absolute; bottom: 20px; left: 20px; z-index: 500;
-      background: white; border-radius: 8px; padding: 10px 14px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column; gap: 6px;
+    .workflow-card {
+      width: 100%; max-width: 520px; background: white; border: 1px solid var(--grey-mid);
+      border-radius: 18px; box-shadow: 0 16px 44px rgba(19, 31, 18, 0.10); overflow: hidden;
     }
-    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-mid); }
-    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .workflow-head {
+      padding: 18px 22px; background: var(--green-dark); color: white;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .workflow-head h3 { font-size: 16px; font-weight: 700; }
+    .workflow-head span { font-size: 12px; color: rgba(255,255,255,0.72); }
+    .workflow-body { padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+    .workflow-step {
+      border: 1px solid var(--grey-mid); border-radius: 12px; padding: 16px 16px 14px;
+      background: var(--grey-light);
+    }
+    .workflow-step-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+    .workflow-step-title { font-size: 14px; font-weight: 700; color: var(--green-dark); }
+    .workflow-step-sub { font-size: 12px; color: var(--text-mid); line-height: 1.5; }
+    .step-chip {
+      padding: 4px 9px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .chip-live { background: #dcfce7; color: #166534; }
+    .chip-warn { background: #fef3c7; color: #92400e; }
+    .chip-risk { background: #fee2e2; color: #991b1b; }
+    .workflow-alert {
+      margin-top: 4px; padding: 12px 14px; background: #fff7ed; border: 1px solid #fed7aa;
+      border-radius: 10px; font-size: 12px; color: #9a3412; line-height: 1.45;
+    }
 
-    /* PROBLEM STRIP */
     .strip {
       background: var(--green-dark); color: white;
       padding: 48px 80px; display: grid; grid-template-columns: 1fr 1fr 1fr;
       gap: 40px;
     }
-    .strip-item { }
     .strip-num { font-size: 36px; font-weight: 700; color: #7bc47b; }
-    .strip-label { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 4px; line-height: 1.5; }
+    .strip-label { font-size: 14px; color: rgba(255,255,255,0.74); margin-top: 4px; line-height: 1.55; }
 
-    /* TIERS */
-    .tiers { padding: 100px 80px; background: var(--grey-light); }
     .section-label { font-size: 12px; font-weight: 600; color: var(--green-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
     .section-title { font-size: 36px; font-weight: 700; color: var(--green-dark); letter-spacing: -0.5px; margin-bottom: 12px; }
-    .section-sub { font-size: 16px; color: var(--text-mid); margin-bottom: 60px; max-width: 560px; }
+    .section-sub { font-size: 16px; color: var(--text-mid); margin-bottom: 60px; max-width: 660px; line-height: 1.65; }
+
+    .wedge { padding: 100px 80px; background: var(--grey-light); }
+    .wedge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .wedge-card {
+      background: white; border-radius: 16px; border: 1px solid var(--grey-mid);
+      padding: 28px;
+    }
+    .wedge-card h3 { font-size: 20px; color: var(--green-dark); margin-bottom: 12px; }
+    .wedge-card p { font-size: 14px; color: var(--text-mid); line-height: 1.65; margin-bottom: 16px; }
+    .wedge-list { display: flex; flex-direction: column; gap: 10px; }
+    .wedge-item { display: flex; gap: 8px; font-size: 13px; color: var(--text-mid); line-height: 1.5; }
+    .wedge-item::before { content: '•'; color: var(--green-light); font-weight: 700; }
+
+    .workflow { padding: 100px 80px; }
+    .workflow-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+    .workflow-map { height: 500px; border-radius: 16px; overflow: hidden; border: 1px solid var(--grey-mid); }
+    .how-steps { display: flex; flex-direction: column; gap: 26px; }
+    .how-step { display: flex; gap: 18px; }
+    .how-step-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--green-pale); color: var(--green-dark);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; flex-shrink: 0;
+    }
+    .how-step-title { font-size: 16px; font-weight: 700; color: var(--green-dark); margin-bottom: 6px; }
+    .how-step-desc { font-size: 14px; color: var(--text-mid); line-height: 1.65; }
+
+    .tiers { padding: 100px 80px; background: var(--grey-light); }
     .tier-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
     .tier-card {
       background: white; border-radius: 14px; padding: 36px 32px;
-      border: 1.5px solid var(--grey-mid); transition: border-color 0.2s;
+      border: 1.5px solid var(--grey-mid); transition: border-color 0.2s; position: relative;
     }
     .tier-card:hover { border-color: var(--green-light); }
-    .tier-card.featured { border-color: var(--green-dark); position: relative; }
+    .tier-card.featured { border-color: var(--green-dark); }
     .tier-badge {
       position: absolute; top: -12px; left: 28px;
       background: var(--green-dark); color: white; font-size: 11px;
@@ -158,24 +202,7 @@
       transition: background 0.2s;
     }
     .tier-card.featured .tier-cta { background: var(--green-dark); color: white; }
-    .tier-cta:hover { opacity: 0.85; }
 
-    /* HOW IT WORKS */
-    .how { padding: 100px 80px; }
-    .how-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-top: 60px; }
-    .how-map { height: 480px; border-radius: 16px; overflow: hidden; border: 1px solid var(--grey-mid); }
-    .how-steps { display: flex; flex-direction: column; gap: 32px; }
-    .how-step { display: flex; gap: 20px; }
-    .how-step-num {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: var(--green-pale); color: var(--green-dark);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 700; flex-shrink: 0;
-    }
-    .how-step-title { font-size: 16px; font-weight: 600; color: var(--green-dark); margin-bottom: 6px; }
-    .how-step-desc { font-size: 14px; color: var(--text-mid); line-height: 1.6; }
-
-    /* DISEASE INTELLIGENCE */
     .intel { padding: 100px 80px; background: var(--green-dark); color: white; }
     .intel .section-title { color: white; }
     .intel .section-sub { color: rgba(255,255,255,0.7); }
@@ -192,13 +219,11 @@
     .trend-up { color: #f87171; }
     .trend-stable { color: #7bc47b; }
 
-    /* CTA SECTION */
     .cta-section { padding: 100px 80px; text-align: center; background: var(--earth-light); }
     .cta-section h2 { font-size: 40px; font-weight: 700; color: var(--green-dark); margin-bottom: 16px; letter-spacing: -0.5px; }
     .cta-section p { font-size: 18px; color: var(--text-mid); margin-bottom: 40px; }
     .cta-actions { display: flex; gap: 16px; justify-content: center; }
 
-    /* FOOTER */
     footer {
       background: var(--green-dark); color: rgba(255,255,255,0.6);
       padding: 40px 80px; display: flex; justify-content: space-between; align-items: center;
@@ -207,7 +232,6 @@
     footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
     footer a:hover { color: white; }
 
-    /* POPUP */
     .leaflet-popup-content-wrapper { border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
     .farm-popup h4 { font-size: 14px; font-weight: 700; color: var(--green-dark); margin-bottom: 8px; }
     .farm-popup .status { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-bottom: 8px; }
@@ -216,6 +240,15 @@
     .farm-popup .status.alert { background: #fee2e2; color: #991b1b; }
     .farm-popup p { font-size: 12px; color: #4a5a4a; margin: 3px 0; }
     .farm-popup a { font-size: 12px; color: var(--green-mid); font-weight: 600; text-decoration: none; }
+
+    @media (max-width: 1100px) {
+      .hero, .workflow-grid, .intel-grid, .wedge-grid, .tier-grid, .strip { grid-template-columns: 1fr; }
+      .hero-right { padding-top: 0; }
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .hero-left, .hero-right, .wedge, .workflow, .tiers, .intel, .cta-section, footer, .strip { padding-left: 24px; padding-right: 24px; }
+      footer { flex-direction: column; gap: 16px; align-items: flex-start; }
+    }
   </style>
 </head>
 <body>
@@ -225,188 +258,237 @@
     <div class="nav-logo-mark">V</div>
     <div>
       <div class="nav-logo-text">VeldRx</div>
-      <div class="nav-logo-sub">Farm & Vet Intelligence</div>
+      <div class="nav-logo-sub">Act 101 dispensing control</div>
     </div>
   </a>
   <div class="nav-links">
-    <a href="map.html">Farm Map</a>
-    <a href="#tiers">Tiers</a>
-    <a href="#how">How It Works</a>
-    <a href="#intel">Disease Intel</a>
-    <a href="map.html" class="nav-cta">Open Platform →</a>
+    <a href="#wedge">Why now</a>
+    <a href="#workflow">Workflow</a>
+    <a href="#tiers">Pricing</a>
+    <a href="#intel">What comes next</a>
+    <a href="map.html" class="nav-cta">Open practice demo →</a>
   </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-left">
-    <div class="hero-badge">Now live — Western Cape pilot</div>
-    <h1>Where <span>veld knowledge</span> meets veterinary compliance</h1>
-    <p class="hero-sub">VeldRx connects farms, vets and regulators on a single platform — tracking medicines, scheduling visits, and surfacing disease patterns before they become outbreaks.</p>
+    <div class="hero-badge">Pilot direction reset for The Animal Hospital</div>
+    <h1>Stop losing control of <span>Act 101 dispensing</span></h1>
+    <p class="hero-sub">VeldRx should not lead as a farm map or disease dashboard. The wedge is simpler and stronger: give large-animal vet practices one place to run scheduled drug orders, field dispensing, withdrawal tracking, and inspection-ready records.</p>
+    <div class="hero-points">
+      <div class="hero-point">One operating layer for monthly farm orders, dispensing logs, and vet routing.</div>
+      <div class="hero-point">Withdrawal periods tracked automatically, instead of buried in WhatsApp, paper, and memory.</div>
+      <div class="hero-point">A DALRRD-ready audit trail first, intelligence layer second.</div>
+    </div>
     <div class="hero-actions">
-      <a href="map.html" class="btn-primary">View Farm Map →</a>
-      <a href="#tiers" class="btn-secondary">See how it works</a>
+      <a href="map.html" class="btn-primary">View repositioned demo →</a>
+      <a href="#workflow" class="btn-secondary">See workflow</a>
     </div>
     <div class="hero-stats">
       <div>
-        <div class="stat-val">35k+</div>
-        <div class="stat-label">Commercial farms<br>in South Africa</div>
+        <div class="stat-val">1 system</div>
+        <div class="stat-label">for orders, dispensing,<br>withdrawals, and visits</div>
       </div>
       <div>
-        <div class="stat-val">R0</div>
-        <div class="stat-label">Dedicated digital<br>compliance tools</div>
+        <div class="stat-val">0 guesswork</div>
+        <div class="stat-label">on active withdrawal<br>risk across client farms</div>
       </div>
       <div>
-        <div class="stat-val">100%</div>
-        <div class="stat-label">Scheduled drug<br>compliance required</div>
+        <div class="stat-val">Ready</div>
+        <div class="stat-label">for inspection, partner audit,<br>and export traceability</div>
       </div>
     </div>
   </div>
   <div class="hero-right">
-    <div id="hero-map"></div>
-    <div class="map-overlay">
-      <div class="map-overlay-title">The Animal Hospital</div>
-      <div class="map-overlay-val">6 farms</div>
-      <div class="map-overlay-sub">Darling / Swartland corridor</div>
-    </div>
-    <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#166534"></div> Compliant</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#b45309"></div> Withdrawal active</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#991b1b"></div> Attention needed</div>
+    <div class="workflow-card">
+      <div class="workflow-head">
+        <div>
+          <h3>The Animal Hospital, Darling</h3>
+          <span>Daily control view</span>
+        </div>
+        <span>6 farms live</span>
+      </div>
+      <div class="workflow-body">
+        <div class="workflow-step">
+          <div class="workflow-step-top">
+            <div class="workflow-step-title">March dispensing batch approved</div>
+            <div class="step-chip chip-live">On track</div>
+          </div>
+          <div class="workflow-step-sub">Monthly medicine orders reconciled against farm histories before anything leaves the practice.</div>
+        </div>
+        <div class="workflow-step">
+          <div class="workflow-step-top">
+            <div class="workflow-step-title">Klein Zout withdrawal still active</div>
+            <div class="step-chip chip-warn">Watch</div>
+          </div>
+          <div class="workflow-step-sub">Milk hold remains visible to both vet and farm until the window clears.</div>
+        </div>
+        <div class="workflow-step">
+          <div class="workflow-step-top">
+            <div class="workflow-step-title">De Hoek order missing</div>
+            <div class="step-chip chip-risk">Risk</div>
+          </div>
+          <div class="workflow-step-sub">No submitted order, no assigned vet, no clean record. Exactly the kind of gap that burns admin time later.</div>
+        </div>
+        <div class="workflow-alert">This is the actual sell: control the messy Act 101 workflow first. Regional disease intelligence becomes valuable once the core practice data is clean and habitual.</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- STRIP -->
 <div class="strip">
-  <div class="strip-item">
-    <div class="strip-num">9 years</div>
-    <div class="strip-label">The average practice has been managing farm medicine records manually</div>
+  <div>
+    <div class="strip-num">Admin drag</div>
+    <div class="strip-label">Practices still stitch together orders, dispensing, and follow-up across paper registers, spreadsheets, and messages.</div>
   </div>
-  <div class="strip-item">
-    <div class="strip-num">0 tools</div>
-    <div class="strip-label">Dedicated digital platforms exist for SA large-animal vet practices</div>
+  <div>
+    <div class="strip-num">Withdrawal risk</div>
+    <div class="strip-label">The expensive mistake is not lack of maps. It is missing what is still under milk or meat withdrawal right now.</div>
   </div>
-  <div class="strip-item">
-    <div class="strip-num">Growing</div>
-    <div class="strip-label">Regulatory pressure from DALRRD and EU export traceability requirements</div>
+  <div>
+    <div class="strip-num">Compliance pressure</div>
+    <div class="strip-label">DALRRD scrutiny and export traceability only get tighter. Practices need control before they need analytics theatre.</div>
   </div>
 </div>
 
-<!-- TIERS -->
-<section class="tiers" id="tiers">
-  <div class="section-label">Platform</div>
-  <div class="section-title">Three ways in</div>
-  <div class="section-sub">Farms, vet practices and regulators each get the layer that's right for them.</div>
-  <div class="tier-grid">
-    <div class="tier-card">
-      <div class="tier-num">T1 · Scout</div>
-      <div class="tier-name">Farm Profile</div>
-      <div class="tier-price"><strong>Free</strong> forever</div>
-      <div class="tier-desc">Get your farm on the map. Basic herd profile, medicine log, and vet connection — no cost, no commitment.</div>
-      <div class="tier-features">
-        <div class="tier-feature">Farm profile & herd info</div>
-        <div class="tier-feature">Basic dispensing log</div>
-        <div class="tier-feature">Vet visit history</div>
-        <div class="tier-feature">Connect to your practice</div>
+<section class="wedge" id="wedge">
+  <div class="section-label">Positioning reset</div>
+  <div class="section-title">Sell the painful job, not the shiny dashboard</div>
+  <div class="section-sub">The current demo presents VeldRx like a broad farm intelligence platform. That makes it feel optional. The stronger wedge is a practice operations product that removes friction, protects compliance, and saves partner time every month.</div>
+  <div class="wedge-grid">
+    <div class="wedge-card">
+      <h3>What it should lead with</h3>
+      <p>VeldRx helps The Animal Hospital manage Act 101 dispensing across multiple farms without losing track of what was ordered, dispensed, administered, or still under withdrawal.</p>
+      <div class="wedge-list">
+        <div class="wedge-item">Monthly farm order capture and approval</div>
+        <div class="wedge-item">Practice-side scheduled drug register</div>
+        <div class="wedge-item">Field visit and dispensing reconciliation</div>
+        <div class="wedge-item">Withdrawal visibility across every client farm</div>
+        <div class="wedge-item">Inspection-ready reporting without paperwork archaeology</div>
       </div>
-      <a href="map.html" class="tier-cta">Get started free</a>
     </div>
-    <div class="tier-card featured">
-      <div class="tier-badge">Most popular</div>
-      <div class="tier-num">T2 · Connect</div>
-      <div class="tier-name">Practice Platform</div>
-      <div class="tier-price"><strong>R850</strong> / practice / month</div>
-      <div class="tier-desc">The full compliance and operations platform for vet practices managing multiple farms. Scheduled drug register, withdrawal tracking, visit routing.</div>
-      <div class="tier-features">
-        <div class="tier-feature">Full dispensing & drug register</div>
-        <div class="tier-feature">Withdrawal period tracker</div>
-        <div class="tier-feature">Vet visit routing & scheduling</div>
-        <div class="tier-feature">Monthly order management</div>
-        <div class="tier-feature">One-click DALRRD compliance reports</div>
-        <div class="tier-feature">Farm portal access for clients</div>
+    <div class="wedge-card">
+      <h3>What gets demoted</h3>
+      <p>Disease heatmaps, regulator layers, and regional outbreak signals are still useful, but they should sit as the expansion path once the practice workflow is embedded.</p>
+      <div class="wedge-list">
+        <div class="wedge-item">Do not pitch “platform for farms, vets, and regulators” on page one.</div>
+        <div class="wedge-item">Do not lead with surveillance if the daily dispensing job is still messy.</div>
+        <div class="wedge-item">Do not make the first impression “nice map”. Make it “finally, control”.</div>
       </div>
-      <a href="#" class="tier-cta">Start pilot</a>
-    </div>
-    <div class="tier-card">
-      <div class="tier-num">T3 · Intelligence</div>
-      <div class="tier-name">Regional Intel</div>
-      <div class="tier-price"><strong>R2,400</strong> / month</div>
-      <div class="tier-desc">Aggregate disease surveillance across your region. See treatment patterns before they become outbreaks. Designed for multi-practice groups and regulatory bodies.</div>
-      <div class="tier-features">
-        <div class="tier-feature">Regional disease heatmap</div>
-        <div class="tier-feature">Antibiotic usage trends</div>
-        <div class="tier-feature">Outbreak early warning</div>
-        <div class="tier-feature">DALRRD regulatory feed</div>
-        <div class="tier-feature">Export traceability (EU/UK)</div>
-      </div>
-      <a href="#" class="tier-cta">Request access</a>
     </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="how" id="how">
-  <div class="section-label">How it works</div>
-  <div class="section-title">From farm gate to compliance report</div>
-  <div class="section-sub">Every medicine that leaves a practice, every farm visit, every scheduled drug — tracked, reconciled, and ready for inspection.</div>
-  <div class="how-grid">
-    <div id="how-map" class="how-map"></div>
+<section class="workflow" id="workflow">
+  <div class="section-label">Practice workflow</div>
+  <div class="section-title">From order request to inspection-ready record</div>
+  <div class="section-sub">The demo still uses the same underlying farm data, but the story is now about the operating loop TAH actually cares about. This is the wedge worth buying.</div>
+  <div class="workflow-grid">
+    <div id="how-map" class="workflow-map"></div>
     <div class="how-steps">
       <div class="how-step">
         <div class="how-step-num">1</div>
         <div>
-          <div class="how-step-title">Farm places monthly order</div>
-          <div class="how-step-desc">Farms submit their medicine order through their portal. The practice reviews, approves, and dispatches — all logged automatically.</div>
+          <div class="how-step-title">Farm submits monthly medicine request</div>
+          <div class="how-step-desc">Orders come in through a controlled channel instead of scattered calls and messages. The practice sees who asked for what, when, and why.</div>
         </div>
       </div>
       <div class="how-step">
         <div class="how-step-num">2</div>
         <div>
-          <div class="how-step-title">Vet visits, medicines dispensed</div>
-          <div class="how-step-desc">Herd visit records, treatments administered, and withdrawal periods are captured in the field or back at the practice. Batch numbers tracked throughout.</div>
+          <div class="how-step-title">Practice approves and dispenses against history</div>
+          <div class="how-step-desc">Before product leaves the shelf, the team can check prior use, assigned vet, and whether the request makes operational sense.</div>
         </div>
       </div>
       <div class="how-step">
         <div class="how-step-num">3</div>
         <div>
-          <div class="how-step-title">Withdrawal alerts fire automatically</div>
-          <div class="how-step-desc">When an animal or batch is in a withdrawal period, the farm and vet are both alerted. Milk and meat safety protected without manual tracking.</div>
+          <div class="how-step-title">Withdrawal periods stay live until resolved</div>
+          <div class="how-step-desc">The important thing is not logging the treatment. It is knowing what is still unsafe to ship, sell, or forget.</div>
         </div>
       </div>
       <div class="how-step">
         <div class="how-step-num">4</div>
         <div>
-          <div class="how-step-title">Compliance reports, one click</div>
-          <div class="how-step-desc">Monthly scheduled drug register, ready for DALRRD inspection. Full audit trail. No paperwork.</div>
+          <div class="how-step-title">Reports are generated from the workflow, not rebuilt after it</div>
+          <div class="how-step-desc">Registers, audit trails, and inspection responses fall out of daily use. No end-of-month cleanup panic.</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- DISEASE INTELLIGENCE -->
+<section class="tiers" id="tiers">
+  <div class="section-label">Commercial shape</div>
+  <div class="section-title">Price the wedge first</div>
+  <div class="section-sub">The product ladder only works if the middle tier is the obvious starting point. That is the practice control layer. Everything else supports it.</div>
+  <div class="tier-grid">
+    <div class="tier-card">
+      <div class="tier-num">Farm access</div>
+      <div class="tier-name">Client Portal</div>
+      <div class="tier-price"><strong>Free</strong> with practice invite</div>
+      <div class="tier-desc">Simple farm-side order requests, visit visibility, and treatment history. Useful, but not the product being sold.</div>
+      <div class="tier-features">
+        <div class="tier-feature">Submit medicine requests</div>
+        <div class="tier-feature">View visit history</div>
+        <div class="tier-feature">See active withdrawal alerts</div>
+        <div class="tier-feature">Access shared farm record</div>
+      </div>
+      <a href="map.html" class="tier-cta">Open farm view</a>
+    </div>
+    <div class="tier-card featured">
+      <div class="tier-badge">Actual wedge</div>
+      <div class="tier-num">Practice platform</div>
+      <div class="tier-name">Act 101 Control</div>
+      <div class="tier-price"><strong>R850</strong> / practice / month</div>
+      <div class="tier-desc">The real product. One place to run scheduled drug orders, field dispensing, withdrawal tracking, vet routing, and compliance reporting.</div>
+      <div class="tier-features">
+        <div class="tier-feature">Central dispensing register</div>
+        <div class="tier-feature">Farm-by-farm withdrawal visibility</div>
+        <div class="tier-feature">Vet visit routing and assignment</div>
+        <div class="tier-feature">Monthly order reconciliation</div>
+        <div class="tier-feature">Inspection-ready reporting</div>
+        <div class="tier-feature">Shared client farm portal</div>
+      </div>
+      <a href="#" class="tier-cta">Start pilot</a>
+    </div>
+    <div class="tier-card">
+      <div class="tier-num">Expansion layer</div>
+      <div class="tier-name">Regional Intelligence</div>
+      <div class="tier-price"><strong>Later</strong> once workflow sticks</div>
+      <div class="tier-desc">Cross-practice disease signals and regional benchmarking become powerful after the operational system is already capturing clean data.</div>
+      <div class="tier-features">
+        <div class="tier-feature">Treatment pattern analysis</div>
+        <div class="tier-feature">Regional outbreak visibility</div>
+        <div class="tier-feature">Antibiotic benchmark reporting</div>
+        <div class="tier-feature">Regulatory and export insight</div>
+      </div>
+      <a href="#intel" class="tier-cta">See expansion path</a>
+    </div>
+  </div>
+</section>
+
 <section class="intel" id="intel">
   <div class="intel-grid">
     <div>
-      <div class="section-label" style="color:#7bc47b">T3 · Intelligence Layer</div>
-      <div class="section-title">See what's moving across the veld</div>
-      <div class="section-sub">When every practice logs what they're treating, patterns emerge. Mastitis cluster in the Darling corridor. Respiratory spike post-rain. The data was always there — now it's visible.</div>
+      <div class="section-label" style="color:#7bc47b">Expansion path</div>
+      <div class="section-title">Then layer in intelligence</div>
+      <div class="section-sub">Once VeldRx owns the dispensing workflow, the regional layer stops feeling speculative. It becomes an earned advantage built on real operational data.</div>
       <div class="intel-cards">
         <div class="intel-card">
-          <div class="intel-card-label">This week · Swartland region</div>
+          <div class="intel-card-label">Swartland signal</div>
           <div class="intel-card-val">↑ Mastitis treatments <span class="trend-up">+34%</span></div>
-          <div class="intel-card-sub">4 farms, 3 practices · Possibly linked to recent heat event</div>
+          <div class="intel-card-sub">Interesting because it now sits on top of actual dispensing and visit records, not separate manual reporting.</div>
         </div>
         <div class="intel-card">
-          <div class="intel-card-label">Antibiotic usage · Rolling 30d</div>
-          <div class="intel-card-val"><span class="trend-stable">Stable</span> — within benchmark</div>
-          <div class="intel-card-sub">6 practices reporting · DALRRD threshold: within limits</div>
+          <div class="intel-card-label">Practice benchmark</div>
+          <div class="intel-card-val"><span class="trend-stable">Stable</span> antibiotic usage</div>
+          <div class="intel-card-sub">Useful for partner oversight and regulator conversations once the core system is adopted.</div>
         </div>
         <div class="intel-card">
-          <div class="intel-card-label">Active withdrawal periods</div>
-          <div class="intel-card-val">3 farms <span style="color:rgba(255,255,255,0.5);font-size:14px">/ 6 in region</span></div>
-          <div class="intel-card-sub">All flagged · No milk or meat at risk</div>
+          <div class="intel-card-label">Export assurance</div>
+          <div class="intel-card-val">3 active withdrawal holds</div>
+          <div class="intel-card-sub">The regional view matters because the practice already trusts the underlying workflow and record quality.</div>
         </div>
       </div>
     </div>
@@ -414,18 +496,17 @@
   </div>
 </section>
 
-<!-- CTA -->
 <section class="cta-section">
-  <h2>Ready to bring your practice onto the map?</h2>
-  <p>Join the Western Cape pilot. Free for farms. Simple setup for practices.</p>
+  <h2>Same demo, sharper story</h2>
+  <p>This build reframes VeldRx around the actual painful job. Side-by-side, the difference should be obvious.</p>
   <div class="cta-actions">
-    <a href="map.html" class="btn-primary">View live demo →</a>
-    <a href="mailto:hello@veldrx.co.za" class="btn-secondary">Get in touch</a>
+    <a href="map.html" class="btn-primary">Open new build →</a>
+    <a href="mailto:hello@veldrx.co.za" class="btn-secondary">Discuss pilot scope</a>
   </div>
 </section>
 
 <footer>
-  <div>© 2026 VeldRx · Connecting South Africa's farms and vets</div>
+  <div>© 2026 VeldRx · Large-animal vet practice operations</div>
   <div style="display:flex;gap:24px">
     <a href="#">Privacy</a>
     <a href="#">Terms</a>
@@ -435,14 +516,13 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  // Farm data — hypothetical, The Animal Hospital, Darling area
   const farms = [
-    { name: "Rooiberg Dairy", lat: -33.42, lng: 18.35, status: "ok", herd: "280 dairy cows", treatment: "None active", next_visit: "Tue 25 Mar" },
-    { name: "Klein Zout Boerdery", lat: -33.28, lng: 18.48, status: "warn", herd: "160 dairy / 40 sheep", treatment: "Mastitis — withdrawal active", next_visit: "Wed 26 Mar" },
-    { name: "Morgenster Plaas", lat: -33.55, lng: 18.28, status: "ok", herd: "420 dairy cows", treatment: "None active", next_visit: "Thu 27 Mar" },
-    { name: "De Hoek Veeplaas", lat: -33.48, lng: 18.55, status: "alert", herd: "310 dairy cows", treatment: "Order overdue — review needed", next_visit: "Mon 24 Mar" },
-    { name: "Swartland Skape", lat: -33.32, lng: 18.22, status: "ok", herd: "800 merino sheep", treatment: "None active", next_visit: "Fri 28 Mar" },
-    { name: "Rypveld Dairy", lat: -33.62, lng: 18.42, status: "warn", herd: "195 dairy cows", treatment: "Post-calving — monitoring", next_visit: "Tue 25 Mar" },
+    { name: "Rooiberg Dairy", lat: -33.42, lng: 18.35, status: "ok", herd: "280 dairy cows", treatment: "Dispensing reconciled", next_visit: "Tue 25 Mar" },
+    { name: "Klein Zout Boerdery", lat: -33.28, lng: 18.48, status: "warn", herd: "160 dairy / 40 sheep", treatment: "Milk withdrawal active", next_visit: "Wed 26 Mar" },
+    { name: "Morgenster Plaas", lat: -33.55, lng: 18.28, status: "ok", herd: "420 dairy cows", treatment: "No active risk", next_visit: "Thu 27 Mar" },
+    { name: "De Hoek Veeplaas", lat: -33.48, lng: 18.55, status: "alert", herd: "310 dairy cows", treatment: "Missing order and review", next_visit: "Mon 24 Mar" },
+    { name: "Swartland Skape", lat: -33.32, lng: 18.22, status: "ok", herd: "800 merino sheep", treatment: "No active risk", next_visit: "Fri 28 Mar" },
+    { name: "Rypveld Dairy", lat: -33.62, lng: 18.42, status: "warn", herd: "195 dairy cows", treatment: "Post-calving monitoring", next_visit: "Tue 25 Mar" },
   ];
 
   const colors = { ok: "#166534", warn: "#b45309", alert: "#991b1b" };
@@ -456,40 +536,29 @@
     const popup = `
       <div class="farm-popup">
         <h4>${farm.name}</h4>
-        <span class="status ${farm.status}">${farm.status === 'ok' ? 'Compliant' : farm.status === 'warn' ? 'Withdrawal active' : 'Attention needed'}</span>
+        <span class="status ${farm.status}">${farm.status === 'ok' ? 'Controlled' : farm.status === 'warn' ? 'Withdrawal active' : 'Review needed'}</span>
         <p>🐄 ${farm.herd}</p>
         <p>💊 ${farm.treatment}</p>
         <p>📅 Next visit: ${farm.next_visit}</p>
-        <br><a href="farm/rooiberg.html">View full profile →</a>
+        <br><a href="farm/rooiberg.html">Open farm record →</a>
       </div>`;
     return L.marker([farm.lat, farm.lng], { icon }).bindPopup(popup);
   }
 
-  // Hero map
-  const heroMap = L.map('hero-map', { zoomControl: false, scrollWheelZoom: false }).setView([-33.42, 18.38], 10);
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-    attribution: '© Esri', maxZoom: 17
-  }).addTo(heroMap);
-  farms.forEach(f => createMarker(f).addTo(heroMap));
-
-  // How map
   const howMap = L.map('how-map', { zoomControl: false, scrollWheelZoom: false }).setView([-33.42, 18.38], 10);
   L.tileLayer('https://tile.opentopomap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenTopoMap', maxZoom: 15
   }).addTo(howMap);
   farms.forEach(f => createMarker(f).addTo(howMap));
-
-  // Draw vet route line
   const routeCoords = farms.filter(f => f.status !== 'alert').map(f => [f.lat, f.lng]);
   L.polyline(routeCoords, { color: '#2d5c2d', weight: 2, dashArray: '6,4', opacity: 0.6 }).addTo(howMap);
 
-  // Intel map
   const intelMap = L.map('intel-map', { zoomControl: false, scrollWheelZoom: false }).setView([-33.42, 18.38], 10);
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: '© Esri', maxZoom: 17
   }).addTo(intelMap);
   farms.forEach(f => {
-    const circle = L.circle([f.lat, f.lng], {
+    L.circle([f.lat, f.lng], {
       radius: f.status === 'warn' ? 8000 : f.status === 'alert' ? 6000 : 4000,
       color: colors[f.status], fillColor: colors[f.status],
       fillOpacity: 0.2, weight: 1.5
