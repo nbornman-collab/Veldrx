@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vet Practice Portal — VeldRx</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --green-dark:#1e3a1e; --green-mid:#2d5c2d; --green-light:#4a8c4a; --green-pale:#e8f0e8;
+      --white:#fff; --grey-light:#f7f8f6; --grey-mid:#e2e8e2; --text-dark:#1a2418; --text-mid:#4a5a4a; --text-light:#7a8a7a;
+      --amber:#b45309; --amber-bg:#fff7ed; --red:#991b1b; --red-bg:#fee2e2; --blue:#1d4ed8; --blue-bg:#eff6ff;
+    }
+    body { font-family:'Inter',sans-serif; background:var(--grey-light); color:var(--text-dark); }
+    nav { height:60px; background:white; border-bottom:1px solid var(--grey-mid); display:flex; align-items:center; justify-content:space-between; padding:0 28px; position:sticky; top:0; z-index:20; }
+    .brand { display:flex; align-items:center; gap:10px; text-decoration:none; }
+    .mark { width:30px; height:30px; border-radius:7px; background:var(--green-dark); color:white; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; }
+    .brand-text { color:var(--green-dark); font-weight:700; }
+    .nav-links { display:flex; gap:10px; align-items:center; }
+    .nav-links a { color:var(--text-mid); text-decoration:none; font-size:13px; font-weight:600; padding:8px 12px; border-radius:8px; }
+    .nav-links a.active, .nav-links a:hover { background:var(--green-pale); color:var(--green-dark); }
+    .page { max-width:1320px; margin:0 auto; padding:28px; }
+    .hero { display:flex; justify-content:space-between; gap:24px; align-items:flex-start; margin-bottom:22px; }
+    .eyebrow { color:var(--green-light); text-transform:uppercase; letter-spacing:.8px; font-size:12px; font-weight:700; margin-bottom:8px; }
+    h1 { color:var(--green-dark); font-size:34px; letter-spacing:-.6px; margin-bottom:8px; }
+    .sub { color:var(--text-mid); line-height:1.55; max-width:760px; font-size:15px; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn { border:0; border-radius:8px; padding:11px 16px; font-family:inherit; font-weight:700; font-size:13px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:7px; }
+    .btn-primary { background:var(--green-dark); color:white; }
+    .btn-secondary { background:white; color:var(--green-dark); border:1px solid var(--grey-mid); }
+    .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
+    .kpi { background:white; border:1px solid var(--grey-mid); border-radius:14px; padding:18px; }
+    .kpi-label { font-size:11px; color:var(--text-light); text-transform:uppercase; font-weight:700; letter-spacing:.5px; }
+    .kpi-val { font-size:27px; font-weight:700; color:var(--green-dark); margin-top:7px; }
+    .kpi-sub { font-size:12px; color:var(--text-light); margin-top:3px; line-height:1.35; }
+    .tabs { background:white; border:1px solid var(--grey-mid); border-radius:16px; overflow:hidden; }
+    .tabbar { display:flex; border-bottom:1px solid var(--grey-mid); background:#fbfcfa; }
+    .tab { padding:16px 20px; border:0; background:transparent; font-family:inherit; font-size:14px; font-weight:700; color:var(--text-mid); cursor:pointer; border-right:1px solid var(--grey-mid); }
+    .tab.active { color:var(--green-dark); background:white; box-shadow:inset 0 -3px 0 var(--green-dark); }
+    .panel { display:none; padding:22px; }
+    .panel.active { display:block; }
+    .grid { display:grid; grid-template-columns:1.25fr .75fr; gap:18px; }
+    .card { background:white; border:1px solid var(--grey-mid); border-radius:14px; padding:18px; }
+    .card.soft { background:var(--grey-light); }
+    .card-title { display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:800; color:var(--green-dark); margin-bottom:14px; }
+    .hint { font-size:12px; color:var(--text-light); font-weight:600; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th { text-align:left; color:var(--text-light); font-size:10px; text-transform:uppercase; letter-spacing:.5px; padding:9px 10px; background:var(--grey-light); }
+    td { padding:12px 10px; border-bottom:1px solid var(--grey-mid); color:var(--text-mid); vertical-align:middle; }
+    tr:last-child td { border-bottom:0; }
+    td strong { color:var(--text-dark); }
+    .pill { display:inline-flex; padding:4px 8px; border-radius:999px; font-size:11px; font-weight:800; white-space:nowrap; }
+    .new { background:var(--blue-bg); color:var(--blue); }
+    .picking { background:var(--green-pale); color:var(--green-dark); }
+    .script { background:var(--amber-bg); color:var(--amber); }
+    .ready { background:#dcfce7; color:#166534; }
+    .back { background:var(--red-bg); color:var(--red); }
+    .deliv { background:#f3f4f6; color:#374151; }
+    .flow { display:grid; gap:10px; }
+    .flow-step { display:flex; gap:12px; align-items:flex-start; padding:13px; background:white; border:1px solid var(--grey-mid); border-radius:12px; }
+    .num { width:26px; height:26px; border-radius:50%; background:var(--green-dark); color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; flex:none; }
+    .flow-title { font-weight:800; color:var(--green-dark); font-size:13px; }
+    .flow-sub { color:var(--text-mid); font-size:12px; line-height:1.45; margin-top:3px; }
+    .split { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .mini-list { display:grid; gap:10px; }
+    .mini { display:flex; justify-content:space-between; gap:12px; padding:12px; border:1px solid var(--grey-mid); border-radius:10px; background:white; font-size:13px; }
+    .mini b { color:var(--text-dark); }
+    .mini span { color:var(--text-light); font-size:12px; }
+    .callout { padding:14px; border-radius:12px; background:var(--amber-bg); color:#9a3412; border:1px solid #fed7aa; font-size:13px; line-height:1.5; }
+    .bar { height:9px; border-radius:99px; background:var(--grey-mid); overflow:hidden; margin-top:8px; }
+    .bar > div { height:100%; background:var(--green-light); }
+    @media(max-width:900px){ .hero,.grid{grid-template-columns:1fr; display:block;} .kpis,.split{grid-template-columns:1fr;} .tabbar{overflow-x:auto;} .tab{white-space:nowrap;} .actions{margin-top:16px;} }
+  </style>
+</head>
+<body>
+<nav>
+  <a class="brand" href="index.html"><div class="mark">V</div><div class="brand-text">VeldRx</div></a>
+  <div class="nav-links">
+    <a class="active" href="practice.html">Vet Practice</a>
+    <a href="map.html">Farm Portal</a>
+    <a href="farm/rooiberg.html">Rooiberg demo</a>
+  </div>
+</nav>
+<main class="page">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">The Animal Hospital · Practice operations</div>
+      <h1>Customer orders, stock, Act 101 and rep intelligence in one working screen.</h1>
+      <p class="sub">This is the first-half product map folded into the demo: Vet Practice is the internal operating system; Farm stays simple for order requests, signatures, documents and back-order status.</p>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary">+ New customer order</button>
+      <button class="btn btn-secondary">Generate Act 101 script</button>
+    </div>
+  </section>
+
+  <section class="kpis">
+    <div class="kpi"><div class="kpi-label">Open customer orders</div><div class="kpi-val">18</div><div class="kpi-sub">6 picking · 3 awaiting vet script</div></div>
+    <div class="kpi"><div class="kpi-label">Back orders</div><div class="kpi-val" style="color:var(--amber)">7</div><div class="kpi-sub">Supplier ETA captured on 5</div></div>
+    <div class="kpi"><div class="kpi-label">Low stock prompts</div><div class="kpi-val">12</div><div class="kpi-sub">Based on SOH + 3-month average</div></div>
+    <div class="kpi"><div class="kpi-label">Act 101 trail</div><div class="kpi-val" style="font-size:22px">Current</div><div class="kpi-sub">Vet sign-off and delivery receipt filed</div></div>
+  </section>
+
+  <section class="tabs">
+    <div class="tabbar">
+      <button class="tab active" onclick="showTab('orders', this)">Customer Orders</button>
+      <button class="tab" onclick="showTab('stock', this)">Stock Ordering</button>
+      <button class="tab" onclick="showTab('intel', this)">Rep Intelligence</button>
+    </div>
+
+    <div class="panel active" id="orders">
+      <div class="grid">
+        <div class="card">
+          <div class="card-title">Daily customer order board <span class="hint">Status system from doc</span></div>
+          <table>
+            <thead><tr><th>Order</th><th>Farm</th><th>Products</th><th>SOH / picked</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><strong>CO-1048</strong></td><td>Rooiberg Dairy</td><td>Pen & Strep, Oxytocin, Terramycin LA</td><td>OK · 7/7 picked</td><td><span class="pill ready">Ready to invoice</span></td></tr>
+              <tr><td><strong>CO-1049</strong></td><td>Klein Zout</td><td>Mastiplan LC, Dexamethasone</td><td>OK · 2/2 picked</td><td><span class="pill script">Awaiting vet script</span></td></tr>
+              <tr><td><strong>CO-1050</strong></td><td>De Hoek Veeplaas</td><td>Gudair, Multimin</td><td>Gudair 0 SOH</td><td><span class="pill back">Back order</span></td></tr>
+              <tr><td><strong>CO-1051</strong></td><td>Swartland Skape</td><td>Ivomec Injection</td><td>OK · picking started</td><td><span class="pill picking">Picking</span></td></tr>
+              <tr><td><strong>CO-1052</strong></td><td>Rypveld Dairy</td><td>Calcium, Oxytocin</td><td>Pending</td><td><span class="pill new">New</span></td></tr>
+              <tr><td><strong>CO-1044</strong></td><td>Morgenster Plaas</td><td>Oxymycin 200</td><td>Complete</td><td><span class="pill deliv">Delivered / signed</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card soft">
+          <div class="card-title">Order flow</div>
+          <div class="flow">
+            <div class="flow-step"><div class="num">1</div><div><div class="flow-title">WhatsApp/email request → Customer Order</div><div class="flow-sub">Captured into a controlled queue instead of living in messages.</div></div></div>
+            <div class="flow-step"><div class="num">2</div><div><div class="flow-title">Tablet picking list</div><div class="flow-sub">Picker sees stock-on-hand, on-order quantity and amount picked.</div></div></div>
+            <div class="flow-step"><div class="num">3</div><div><div class="flow-title">Invoice, labels and Act 101 script</div><div class="flow-sub">Script is generated where required, signed/acknowledged and filed digitally.</div></div></div>
+            <div class="flow-step"><div class="num">4</div><div><div class="flow-title">Delivery signature closes the loop</div><div class="flow-sub">Driver captures receipt. Order stays open until back-orders are completed or manually closed.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="stock">
+      <div class="split">
+        <div class="card"><div class="card-title">Low stock prompts</div><div class="mini-list">
+          <div class="mini"><div><b>Mastiplan LC</b><br><span>3-month avg: 42 tubes</span></div><span>8 SOH</span></div>
+          <div class="mini"><div><b>Terramycin LA</b><br><span>Seasonal lift expected</span></div><span>5 SOH</span></div>
+          <div class="mini"><div><b>Oxytocin 10ml</b><br><span>Monthly reorder due</span></div><span>11 SOH</span></div>
+        </div></div>
+        <div class="card"><div class="card-title">Supplier OOS / ETA</div><div class="mini-list">
+          <div class="mini"><div><b>Gudair</b><br><span>Supplier OOS</span></div><span>ETA 12 Apr</span></div>
+          <div class="mini"><div><b>Lumpyvax</b><br><span>Limited allocation</span></div><span>ETA 28 Mar</span></div>
+          <div class="mini"><div><b>Bloutong vaccine</b><br><span>Seasonal reminder</span></div><span>Order now</span></div>
+        </div></div>
+        <div class="card"><div class="card-title">Act 101 supplier order</div><div class="callout">Supplier orders that include Act 101 items now carry their own vet script/sign-off trail, so compliance is visible from purchase through customer delivery.</div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="intel">
+      <div class="grid">
+        <div class="card">
+          <div class="card-title">Rep summary — same season / month year-on-year</div>
+          <table>
+            <thead><tr><th>Category</th><th>This Mar</th><th>Last Mar</th><th>Signal</th><th>Follow-up</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Act 101</strong></td><td>R86k</td><td>R72k</td><td><span class="pill ready">+19%</span></td><td>Check mastitis protocol shift</td></tr>
+              <tr><td><strong>Act 36</strong></td><td>R44k</td><td>R61k</td><td><span class="pill script">-28%</span></td><td>OOS explains vaccine drop</td></tr>
+              <tr><td><strong>Services rendered</strong></td><td>R31k</td><td>R29k</td><td><span class="pill ready">Stable</span></td><td>Routine visit cadence holding</td></tr>
+              <tr><td><strong>Stopped products</strong></td><td colspan="3">Gudair, Bloutong vaccine — no March sales because supplier OOS / ETA pending</td><td>Protect rep relationship</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card soft">
+          <div class="card-title">Suggested follow-up questions</div>
+          <div class="flow">
+            <div class="flow-step"><div class="num">?</div><div><div class="flow-title">Why did Mastiplan LC jump at Klein Zout?</div><div class="flow-sub">Check if protocol changed or if this is a herd-health warning.</div></div></div>
+            <div class="flow-step"><div class="num">?</div><div><div class="flow-title">Which farms are exposed by Gudair back-order?</div><div class="flow-sub">Use ETA to schedule communication before the farmer chases.</div></div></div>
+            <div class="flow-step"><div class="num">?</div><div><div class="flow-title">Can Act 36 drop be explained by supplier OOS?</div><div class="flow-sub">Separate lost demand from product availability before blaming the rep.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

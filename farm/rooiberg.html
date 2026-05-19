@@ -88,8 +88,8 @@
       <div class="farm-badge">✓ Compliant — all records up to date</div>
     </div>
     <div class="header-actions">
-      <button class="btn btn-outline">Export records</button>
-      <button class="btn btn-primary">+ Log dispensing</button>
+      <button class="btn btn-outline">Download invoices/scripts</button>
+      <button class="btn btn-primary">Request order</button>
     </div>
   </div>
 
@@ -110,24 +110,24 @@
       <div class="metric-sub">All milk & meat clear</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">Last order</div>
-      <div class="metric-val" style="font-size:18px">1 Mar 2026</div>
-      <div class="metric-sub">R4,280 · 6 products</div>
+      <div class="metric-label">Order status</div>
+      <div class="metric-val" style="font-size:18px">Delivered / signed</div>
+      <div class="metric-sub">CO-1048 · no back-orders</div>
     </div>
   </div>
 
   <div class="grid-main">
     <div class="card">
-      <div class="card-title">Current medicine dispensing log <a href="#">View full register →</a></div>
+      <div class="card-title">Current medicine order <a href="#">View invoice/script pack →</a></div>
       <table>
-        <thead><tr><th>Product</th><th>Qty</th><th>Dispensed</th><th>Batch</th><th>Withdrawal</th></tr></thead>
+        <thead><tr><th>Product</th><th>Qty</th><th>Picked</th><th>Batch</th><th>Farm status</th></tr></thead>
         <tbody>
-          <tr><td><strong>Pen & Strep 100ml</strong></td><td>4 × 100ml</td><td>1 Mar</td><td>AH-2603-01</td><td><span class="status-pill pill-ok">None</span></td></tr>
-          <tr><td><strong>Oxytocin 10ml</strong></td><td>2 × 10ml</td><td>1 Mar</td><td>AH-2603-02</td><td><span class="status-pill pill-ok">None</span></td></tr>
-          <tr><td><strong>Terramycin LA</strong></td><td>1 × 250ml</td><td>1 Mar</td><td>AH-2603-03</td><td><span class="status-pill pill-ok">Cleared 8 Mar</span></td></tr>
-          <tr><td><strong>Multimin 500ml</strong></td><td>1 × 500ml</td><td>1 Mar</td><td>AH-2603-04</td><td><span class="status-pill pill-ok">None</span></td></tr>
-          <tr><td><strong>Calcium Borogluconate</strong></td><td>3 × 400ml</td><td>1 Mar</td><td>AH-2603-05</td><td><span class="status-pill pill-ok">None</span></td></tr>
-          <tr><td><strong>Ivomec Injection</strong></td><td>1 × 500ml</td><td>1 Mar</td><td>AH-2603-06</td><td><span class="status-pill pill-ok">None</span></td></tr>
+          <tr><td><strong>Pen & Strep 100ml</strong></td><td>4 × 100ml</td><td>Picked</td><td>AH-2603-01</td><td><span class="status-pill pill-ok">Delivered</span></td></tr>
+          <tr><td><strong>Oxytocin 10ml</strong></td><td>2 × 10ml</td><td>Picked</td><td>AH-2603-02</td><td><span class="status-pill pill-ok">Delivered</span></td></tr>
+          <tr><td><strong>Terramycin LA</strong></td><td>1 × 250ml</td><td>Picked</td><td>AH-2603-03</td><td><span class="status-pill pill-ok">Script filed</span></td></tr>
+          <tr><td><strong>Multimin 500ml</strong></td><td>1 × 500ml</td><td>Picked</td><td>AH-2603-04</td><td><span class="status-pill pill-ok">Delivered</span></td></tr>
+          <tr><td><strong>Calcium Borogluconate</strong></td><td>3 × 400ml</td><td>Picked</td><td>AH-2603-05</td><td><span class="status-pill pill-ok">Delivered</span></td></tr>
+          <tr><td><strong>Ivomec Injection</strong></td><td>1 × 500ml</td><td>Picked</td><td>AH-2603-06</td><td><span class="status-pill pill-ok">Delivered</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -136,35 +136,35 @@
 
   <div class="grid-bottom">
     <div class="card">
-      <div class="card-title">Visit history</div>
+      <div class="card-title">Order / document timeline</div>
       <div class="visit-item">
         <div class="visit-date">1 Mar</div>
         <div class="visit-dot"></div>
-        <div><div class="visit-title">Monthly herd visit · Dr Van der Merwe</div><div class="visit-sub">Routine check · 3 treated for mastitis · Terramycin LA dispensed · withdrawal now cleared</div></div>
+        <div><div class="visit-title">Delivery receipt signed</div><div class="visit-sub">Driver captured receipt signature · invoice and Act 101 script available in documents</div></div>
       </div>
       <div class="visit-item">
         <div class="visit-date">1 Feb</div>
         <div class="visit-dot"></div>
-        <div><div class="visit-title">Monthly herd visit · Dr Van der Merwe</div><div class="visit-sub">No treatments required · Multivitamin boost administered · all clear</div></div>
+        <div><div class="visit-title">Customer order CO-1048 delivered</div><div class="visit-sub">All products delivered · no back-orders remaining</div></div>
       </div>
       <div class="visit-item">
         <div class="visit-date">15 Jan</div>
         <div class="visit-dot"></div>
-        <div><div class="visit-title">Emergency call-out · Dr Bosman</div><div class="visit-sub">2 x calving complications · Oxytocin administered · all recovered</div></div>
+        <div><div class="visit-title">Act 101 script acknowledged</div><div class="visit-sub">Terramycin LA script signed and filed digitally by practice vet</div></div>
       </div>
       <div class="visit-item">
         <div class="visit-date">3 Jan</div>
         <div class="visit-dot"></div>
-        <div><div class="visit-title">Monthly herd visit · Dr Van der Merwe</div><div class="visit-sub">Routine check · TB test administered (negative) · compliant</div></div>
+        <div><div class="visit-title">Order requested by farm</div><div class="visit-sub">Farm submitted request through portal instead of WhatsApp/email thread</div></div>
       </div>
     </div>
     <div class="card">
       <div class="card-title">Compliance status</div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="background:#dcfce7;border-radius:8px;padding:12px 14px">
-          <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px">Scheduled drug register</div>
-          <div style="font-size:14px;font-weight:700;color:#166534;margin-top:4px">✓ Up to date</div>
-          <div style="font-size:11px;color:#166534;opacity:0.8;margin-top:2px">Last updated 1 Mar 2026</div>
+          <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px">Customer order</div>
+          <div style="font-size:14px;font-weight:700;color:#166534;margin-top:4px">✓ Delivered / signed</div>
+          <div style="font-size:11px;color:#166534;opacity:0.8;margin-top:2px">Receipt captured 1 Mar 2026</div>
         </div>
         <div style="background:#dcfce7;border-radius:8px;padding:12px 14px">
           <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px">Withdrawal periods</div>
@@ -172,9 +172,9 @@
           <div style="font-size:11px;color:#166534;opacity:0.8;margin-top:2px">Milk & meat — no restrictions</div>
         </div>
         <div style="background:#dcfce7;border-radius:8px;padding:12px 14px">
-          <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px">DALRRD register</div>
-          <div style="font-size:14px;font-weight:700;color:#166534;margin-top:4px">✓ Ready to export</div>
-          <div style="font-size:11px;color:#166534;opacity:0.8;margin-top:2px"><a href="#" style="color:#166534">Download PDF report →</a></div>
+          <div style="font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px">Documents</div>
+          <div style="font-size:14px;font-weight:700;color:#166534;margin-top:4px">✓ Invoice + scripts available</div>
+          <div style="font-size:11px;color:#166534;opacity:0.8;margin-top:2px"><a href="#" style="color:#166534">Download document pack →</a></div>
         </div>
       </div>
     </div>

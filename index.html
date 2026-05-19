@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VeldRx — Act 101 Dispensing Control for Large-Animal Vet Practices</title>
+  <title>VeldRx — Vet Medicine Operations for Practices and Farms</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
@@ -135,6 +135,26 @@
       margin-top: 4px; padding: 12px 14px; background: #fff7ed; border: 1px solid #fed7aa;
       border-radius: 10px; font-size: 12px; color: #9a3412; line-height: 1.45;
     }
+    .portal-section { padding: 100px 80px; background: var(--white); }
+    .portal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .portal-card {
+      background: var(--grey-light); border: 1px solid var(--grey-mid); border-radius: 18px;
+      padding: 30px; display: flex; flex-direction: column; min-height: 330px;
+    }
+    .portal-card.featured { background: var(--green-dark); color: white; border-color: var(--green-dark); }
+    .portal-kicker { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--green-light); margin-bottom: 10px; }
+    .portal-card.featured .portal-kicker { color: #7bc47b; }
+    .portal-title { font-size: 26px; font-weight: 700; color: var(--green-dark); margin-bottom: 10px; }
+    .portal-card.featured .portal-title { color: white; }
+    .portal-desc { font-size: 14px; color: var(--text-mid); line-height: 1.65; margin-bottom: 22px; }
+    .portal-card.featured .portal-desc { color: rgba(255,255,255,0.72); }
+    .portal-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .portal-item { font-size: 13px; line-height: 1.45; color: var(--text-mid); display: flex; gap: 8px; }
+    .portal-card.featured .portal-item { color: rgba(255,255,255,0.82); }
+    .portal-item::before { content: '✓'; color: var(--green-light); font-weight: 700; }
+    .portal-card.featured .portal-item::before { color: #7bc47b; }
+    .portal-link { margin-top: auto; width: fit-content; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 16px; border-radius: 8px; background: var(--green-dark); color: white; }
+    .portal-card.featured .portal-link { background: white; color: var(--green-dark); }
 
     .strip {
       background: var(--green-dark); color: white;
@@ -242,11 +262,11 @@
     .farm-popup a { font-size: 12px; color: var(--green-mid); font-weight: 600; text-decoration: none; }
 
     @media (max-width: 1100px) {
-      .hero, .workflow-grid, .intel-grid, .wedge-grid, .tier-grid, .strip { grid-template-columns: 1fr; }
+      .hero, .workflow-grid, .intel-grid, .wedge-grid, .tier-grid, .portal-grid, .strip { grid-template-columns: 1fr; }
       .hero-right { padding-top: 0; }
       nav { padding: 0 20px; }
       .nav-links { display: none; }
-      .hero-left, .hero-right, .wedge, .workflow, .tiers, .intel, .cta-section, footer, .strip { padding-left: 24px; padding-right: 24px; }
+      .hero-left, .hero-right, .wedge, .workflow, .tiers, .portal-section, .intel, .cta-section, footer, .strip { padding-left: 24px; padding-right: 24px; }
       footer { flex-direction: column; gap: 16px; align-items: flex-start; }
     }
   </style>
@@ -263,31 +283,32 @@
   </a>
   <div class="nav-links">
     <a href="#wedge">Why now</a>
+    <a href="#portals">Portals</a>
     <a href="#workflow">Workflow</a>
     <a href="#tiers">Pricing</a>
     <a href="#intel">What comes next</a>
-    <a href="map.html" class="nav-cta">Open practice demo →</a>
+    <a href="practice.html" class="nav-cta">Open practice demo →</a>
   </div>
 </nav>
 
 <section class="hero">
   <div class="hero-left">
-    <div class="hero-badge">Pilot direction reset for The Animal Hospital</div>
-    <h1>Stop losing control of <span>Act 101 dispensing</span></h1>
-    <p class="hero-sub">VeldRx should not lead as a farm map or disease dashboard. The wedge is simpler and stronger: give large-animal vet practices one place to run scheduled drug orders, field dispensing, withdrawal tracking, and inspection-ready records.</p>
+    <div class="hero-badge">Product map incorporated · first half</div>
+    <h1>The operating system for <span>vet medicine orders</span></h1>
+    <p class="hero-sub">VeldRx connects customer orders, stock on hand, supplier ordering, Act 101 compliance, back-orders, delivery signatures and rep intelligence. The practice runs the workflow; the farm gets a simple portal for requests, documents and signatures.</p>
     <div class="hero-points">
-      <div class="hero-point">One operating layer for monthly farm orders, dispensing logs, and vet routing.</div>
-      <div class="hero-point">Withdrawal periods tracked automatically, instead of buried in WhatsApp, paper, and memory.</div>
-      <div class="hero-point">A DALRRD-ready audit trail first, intelligence layer second.</div>
+      <div class="hero-point">Vet Practice portal for customer orders, stock ordering, Act 101 trails and monitoring.</div>
+      <div class="hero-point">Farm portal kept deliberately simple: request order, sign receipt, view scripts/invoices and back-orders.</div>
+      <div class="hero-point">Rep Intelligence explains increases, drops and stopped products using supplier OOS and ETA data.</div>
     </div>
     <div class="hero-actions">
-      <a href="map.html" class="btn-primary">View repositioned demo →</a>
-      <a href="#workflow" class="btn-secondary">See workflow</a>
+      <a href="practice.html" class="btn-primary">Open Vet Practice portal →</a>
+      <a href="map.html" class="btn-secondary">Open Farm portal</a>
     </div>
     <div class="hero-stats">
       <div>
         <div class="stat-val">1 system</div>
-        <div class="stat-label">for orders, dispensing,<br>withdrawals, and visits</div>
+        <div class="stat-label">for orders, stock,<br>scripts, and delivery</div>
       </div>
       <div>
         <div class="stat-val">0 guesswork</div>
@@ -304,34 +325,64 @@
       <div class="workflow-head">
         <div>
           <h3>The Animal Hospital, Darling</h3>
-          <span>Daily control view</span>
+          <span>Customer orders dashboard</span>
         </div>
-        <span>6 farms live</span>
+        <span>18 orders open</span>
       </div>
       <div class="workflow-body">
         <div class="workflow-step">
           <div class="workflow-step-top">
-            <div class="workflow-step-title">March dispensing batch approved</div>
-            <div class="step-chip chip-live">On track</div>
+            <div class="workflow-step-title">CO-1048 ready to invoice</div>
+            <div class="step-chip chip-live">Picked</div>
           </div>
-          <div class="workflow-step-sub">Monthly medicine orders reconciled against farm histories before anything leaves the practice.</div>
+          <div class="workflow-step-sub">Invoice, labels and delivery paperwork generated from the same order record.</div>
         </div>
         <div class="workflow-step">
           <div class="workflow-step-top">
-            <div class="workflow-step-title">Klein Zout withdrawal still active</div>
-            <div class="step-chip chip-warn">Watch</div>
+            <div class="workflow-step-title">Klein Zout awaiting vet script</div>
+            <div class="step-chip chip-warn">Act 101</div>
           </div>
-          <div class="workflow-step-sub">Milk hold remains visible to both vet and farm until the window clears.</div>
+          <div class="workflow-step-sub">Script is generated automatically, then signed/acknowledged and filed digitally.</div>
         </div>
         <div class="workflow-step">
           <div class="workflow-step-top">
-            <div class="workflow-step-title">De Hoek order missing</div>
-            <div class="step-chip chip-risk">Risk</div>
+            <div class="workflow-step-title">Gudair supplier OOS</div>
+            <div class="step-chip chip-risk">Back order</div>
           </div>
-          <div class="workflow-step-sub">No submitted order, no assigned vet, no clean record. Exactly the kind of gap that burns admin time later.</div>
+          <div class="workflow-step-sub">ETA captured so the order stays open and the rep has a clean explanation for the farmer.</div>
         </div>
-        <div class="workflow-alert">This is the actual sell: control the messy Act 101 workflow first. Regional disease intelligence becomes valuable once the core practice data is clean and habitual.</div>
+        <div class="workflow-alert">Customer Orders is now the home screen: New → Picking → Awaiting vet script → Ready to invoice → Back order → Out for delivery → Delivered / signed → Closed.</div>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="portal-section" id="portals">
+  <div class="section-label">Two portals</div>
+  <div class="section-title">Practice runs the operation. Farm keeps it simple.</div>
+  <div class="section-sub">The product map splits VeldRx into two clean entry points instead of one overloaded dashboard.</div>
+  <div class="portal-grid">
+    <div class="portal-card featured">
+      <div class="portal-kicker">Vet Practice portal</div>
+      <div class="portal-title">Internal operations</div>
+      <div class="portal-desc">The daily working layer for practice staff: orders, picking, stock, supplier ETAs, Act 101 scripts, delivery signatures and rep intelligence.</div>
+      <div class="portal-list">
+        <div class="portal-item">Customer Orders as the home screen</div>
+        <div class="portal-item">Stock Ordering with SOH, low-stock prompts and seasonal reminders</div>
+        <div class="portal-item">Rep Intelligence for year-on-year medicine monitoring</div>
+      </div>
+      <a class="portal-link" href="practice.html">Open Vet Practice portal →</a>
+    </div>
+    <div class="portal-card">
+      <div class="portal-kicker">Farm portal</div>
+      <div class="portal-title">Client-facing basics</div>
+      <div class="portal-desc">Farm users should not inherit practice admin complexity. They need a simple place to request orders, sign receipts, see back-orders and access scripts/invoices.</div>
+      <div class="portal-list">
+        <div class="portal-item">Submit/request order</div>
+        <div class="portal-item">View order and back-order status</div>
+        <div class="portal-item">Sign receipt digitally and access documents</div>
+      </div>
+      <a class="portal-link" href="map.html">Open Farm portal →</a>
     </div>
   </div>
 </section>
@@ -500,7 +551,7 @@
   <h2>Same demo, sharper story</h2>
   <p>This build reframes VeldRx around the actual painful job. Side-by-side, the difference should be obvious.</p>
   <div class="cta-actions">
-    <a href="map.html" class="btn-primary">Open new build →</a>
+    <a href="practice.html" class="btn-primary">Open Vet Practice portal →</a>
     <a href="mailto:hello@veldrx.co.za" class="btn-secondary">Discuss pilot scope</a>
   </div>
 </section>
