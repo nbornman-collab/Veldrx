@@ -77,6 +77,13 @@
       color: var(--text-mid); transition: all 0.15s;
     }
     .filter-chip.active { border-color: var(--green-dark); background: var(--green-dark); color: white; }
+
+    .risk-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:12px 20px; border-bottom:1px solid var(--grey-mid); background:#fbfcfa; }
+    .risk-summary div { background:white; border:1px solid var(--grey-mid); border-radius:10px; padding:10px; }
+    .risk-summary strong { display:block; color:var(--green-dark); font-size:20px; line-height:1; }
+    .risk-summary strong.warn { color:#b45309; }
+    .risk-summary strong.alert { color:#991b1b; }
+    .risk-summary span { display:block; color:var(--text-light); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; margin-top:5px; }
     .farm-list { flex: 1; overflow-y: auto; }
     .farm-item {
       padding: 14px 20px; border-bottom: 1px solid var(--grey-mid);
@@ -166,20 +173,21 @@
       .map-tab { flex: 1; min-width: max-content; padding: 8px 10px; }
       .app { flex-direction: column; overflow: visible; }
       .sidebar { width: 100%; border-right: 0; border-bottom: 1px solid var(--grey-mid); max-height: none; }
-      .sidebar-header { padding: 14px 16px; }
+      .sidebar-header { padding: 16px 16px 12px; }
+      .sidebar-title { font-size:18px; }
+      .sidebar-sub { font-size:12px; line-height:1.35; }
       .sidebar-search { margin: 10px 16px 0; }
       .sidebar-filters { padding: 10px 16px; overflow-x: auto; }
       .filter-chip { white-space: nowrap; }
-      .farm-list { max-height: 280px; overflow-y: auto; }
-      .farm-item { padding: 13px 16px; }
+      .risk-summary { padding: 10px 16px; }
+      .farm-list { max-height: none; overflow-y: visible; }
+      .farm-item { padding: 14px 16px; }
+      .farm-item-name { font-size:14px; }
+      .detail-panel.open { display:block; }
       .detail-body { max-height: none; }
-      .farm-actions { grid-template-columns: 1fr; margin: 0 16px 12px; }
-      .map-container { min-height: 430px; height: 430px; flex: none; }
-      .map-controls { top: 10px; right: 10px; }
-      .map-control-btn { padding: 8px 10px; font-size: 11px; }
-      .map-stats { left: 10px; right: 10px; bottom: 12px; justify-content: stretch; }
-      .map-stat { flex: 1; padding: 8px; }
-      .map-stat-val { font-size: 17px; }
+      .farm-actions { grid-template-columns: 1fr; margin: 0 16px 14px; }
+      .detail-action { margin-left:16px; margin-right:16px; }
+      .map-container { display:none; }
     }
   </style>
 </head>
@@ -205,8 +213,8 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-title">Farm Portal</div>
-      <div class="sidebar-sub">Orders · back-orders · documents · signatures</div>
+      <div class="sidebar-title">Farm Book / Risk Board</div>
+      <div class="sidebar-sub">10 farms · orders · withdrawal risk · documents · signatures</div>
     </div>
     <div class="sidebar-search">
       <span>🔍</span>
@@ -217,6 +225,11 @@
       <button class="filter-chip" onclick="setFilter('ok', this)">Compliant</button>
       <button class="filter-chip" onclick="setFilter('warn', this)">Withdrawal</button>
       <button class="filter-chip" onclick="setFilter('alert', this)">Attention</button>
+    </div>
+    <div class="risk-summary">
+      <div><strong>4</strong><span>Compliant</span></div>
+      <div><strong class="warn">3</strong><span>Withdrawal</span></div>
+      <div><strong class="alert">3</strong><span>Blinking red</span></div>
     </div>
     <div class="farm-list" id="farm-list"></div>
     <div class="detail-panel" id="detail-panel">
