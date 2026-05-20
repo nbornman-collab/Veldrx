@@ -87,6 +87,8 @@
 
     .tap-hint { padding:10px 20px; border-bottom:1px solid var(--grey-mid); color:var(--text-light); font-size:12px; background:#fff; }
     .detail-scrim { display:none; }
+
+    .inline-detail { display:none; }
     .farm-list { flex: 1; overflow-y: auto; }
     .farm-item {
       padding: 14px 20px; border-bottom: 1px solid var(--grey-mid);
@@ -186,6 +188,16 @@
       .farm-list { max-height: none; overflow-y: visible; }
       .farm-item { padding: 14px 16px; }
       .farm-item-name { font-size:14px; }
+      .farm-item { flex-wrap:wrap; }
+
+      .inline-detail { display:block; width:100%; margin:12px 0 0 22px; padding:12px; border-radius:12px; border:1px solid var(--grey-mid); background:#fbfcfa; }
+      .inline-detail-title { font-size:11px; font-weight:800; color:var(--text-light); text-transform:uppercase; letter-spacing:.4px; margin-bottom:8px; }
+      .inline-detail-row { display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid var(--grey-mid); font-size:12px; }
+      .inline-detail-row:last-child { border-bottom:0; }
+      .inline-detail-row span:first-child { color:var(--text-light); }
+      .inline-detail-row span:last-child { color:var(--text-dark); font-weight:700; text-align:right; }
+      .inline-detail-actions { display:grid; grid-template-columns:1fr; gap:8px; margin-top:10px; }
+      .inline-detail-actions a { text-align:center; padding:10px; border-radius:8px; text-decoration:none; font-size:12px; font-weight:800; background:var(--green-dark); color:white; }
       .detail-panel { border-top:0; }
       .detail-panel.open { display:flex; position:fixed; left:10px; right:10px; bottom:10px; max-height:78vh; z-index:3000; border-radius:18px; overflow:hidden; box-shadow:0 18px 60px rgba(0,0,0,.30); border:1px solid var(--grey-mid); }
       .detail-header { padding:16px; }
@@ -336,6 +348,7 @@ const farms = [
 
 const colors = { ok: "#166534", warn: "#b45309", alert: "#991b1b" };
 let currentFilter = 'all';
+let selectedFarmId = null;
 let showRoute = true;
 let showZones = false;
 let routeLayer, zoneLayer;
@@ -361,6 +374,21 @@ function setLayer(layer) {
 }
 
 // Render farms
+
+function inlineFarmDetail(farm) {
+  const farmUrl = `farm/${farm.slug}.html`;
+  const firstDrug = farm.drugs[0] ? `${farm.drugs[0].name}${farm.drugs[0].withdrawal ? ' · ' + farm.drugs[0].withdrawal : ''}` : 'No active order on file';
+  return `
+    <div class="inline-detail" onclick="event.stopPropagation()">
+      <div class="inline-detail-title">Order/risk detail</div>
+      <div class="inline-detail-row"><span>Order</span><span>${farm.order} · ${farm.order_status}</span></div>
+      <div class="inline-detail-row"><span>Vet</span><span>${farm.vet}</span></div>
+      <div class="inline-detail-row"><span>Last order</span><span>${farm.last_order}</span></div>
+      <div class="inline-detail-row"><span>Medicine</span><span>${firstDrug}</span></div>
+      <div class="inline-detail-actions"><a href="${farmUrl}">Open full farm record →</a></div>
+    </div>`;
+}
+
 function renderFarmList() {
   const search = document.getElementById('search-input').value.toLowerCase();
   const list = document.getElementById('farm-list');
@@ -372,6 +400,8 @@ function renderFarmList() {
     div.className = 'farm-item';
     div.id = `farm-item-${f.id}`;
     const tagText = { ok: 'Compliant', warn: 'Withdrawal active', alert: 'Attention needed' };
+    const isSelected = selectedFarmId === f.id;
+    div.className = `farm-item ${isSelected ? 'selected' : ''}`;
     div.innerHTML = `
       <div class="farm-dot ${f.status === 'alert' ? 'alert-dot' : ''}" style="background:${colors[f.status]}"></div>
       <div>
@@ -379,8 +409,12 @@ function renderFarmList() {
         <div class="farm-item-meta">${f.herd} · ${f.district}</div>
         <div class="farm-item-meta">Next visit: ${f.next_visit} · ${f.vet}</div>
         <span class="farm-item-tag tag-${f.status}">${tagText[f.status]}</span>
-      </div>`;
-    div.onclick = () => selectFarm(f);
+      </div>
+      ${isSelected ? inlineFarmDetail(f) : ''}`;
+    div.addEventListener('click', (event) => {
+      if (event.target.closest('a')) return;
+      selectFarm(f);
+    });
     list.appendChild(div);
   });
 }
@@ -400,10 +434,11 @@ farms.forEach(f => {
 });
 
 function selectFarm(farm) {
-  document.querySelectorAll('.farm-item').forEach(el => el.classList.remove('selected'));
+  selectedFarmId = selectedFarmId === farm.id ? null : farm.id;
+  renderFarmList();
   const item = document.getElementById(`farm-item-${farm.id}`);
-  if (item) item.classList.add('selected');
-  map.flyTo([farm.lat, farm.lng], 13, { duration: 0.8 });
+  if (item) item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  if (window.innerWidth > 760 && typeof map !== 'undefined') map.flyTo([farm.lat, farm.lng], 13, { duration: 0.8 });
 
   const tagText = { ok: 'Compliant', warn: 'Withdrawal active', alert: 'Attention needed' };
   document.getElementById('detail-name').textContent = farm.name;
@@ -431,16 +466,20 @@ function selectFarm(farm) {
   document.getElementById('detail-action').href = farmUrl;
   document.getElementById('request-action').href = farmUrl;
   document.getElementById('sign-action').href = farmUrl;
-  document.getElementById('detail-panel').classList.add('open');
+  if (selectedFarmId === farm.id) document.getElementById('detail-panel').classList.add('open');
+  else document.getElementById('detail-panel').classList.remove('open');
 }
 
 function closeDetail() {
+  selectedFarmId = null;
   document.getElementById('detail-panel').classList.remove('open');
-  document.querySelectorAll('.farm-item').forEach(el => el.classList.remove('selected'));
+  renderFarmList();
 }
 
 function setFilter(filter, btn) {
   currentFilter = filter;
+  selectedFarmId = null;
+  document.getElementById('detail-panel').classList.remove('open');
   document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
   btn.classList.add('active');
   renderFarmList();
