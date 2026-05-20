@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Farm Portal — VeldRx</title>
+  <title>Farm Book / Risk Board — VeldRx</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
@@ -84,13 +84,16 @@
     .risk-summary strong.warn { color:#b45309; }
     .risk-summary strong.alert { color:#991b1b; }
     .risk-summary span { display:block; color:var(--text-light); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; margin-top:5px; }
+
+    .tap-hint { padding:10px 20px; border-bottom:1px solid var(--grey-mid); color:var(--text-light); font-size:12px; background:#fff; }
+    .detail-scrim { display:none; }
     .farm-list { flex: 1; overflow-y: auto; }
     .farm-item {
       padding: 14px 20px; border-bottom: 1px solid var(--grey-mid);
       cursor: pointer; transition: background 0.1s; display: flex; gap: 12px; align-items: flex-start;
     }
     .farm-item:hover { background: var(--grey-light); }
-    .farm-item.selected { background: var(--green-pale); }
+    .farm-item.selected { background: var(--green-pale); box-shadow: inset 4px 0 0 var(--green-dark); }
     .farm-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
     .farm-item-name { font-size: 13px; font-weight: 600; color: var(--text-dark); }
     .farm-item-meta { font-size: 12px; color: var(--text-light); margin-top: 2px; }
@@ -169,7 +172,7 @@
       .nav-right { order: 2; margin-left: auto; gap: 6px; }
       .nav-pill { display: none; }
       .nav-btn { padding: 7px 10px; font-size: 12px; }
-      .nav-center { order: 3; width: 100%; overflow-x: auto; padding-top: 2px; }
+      .nav-center { display:none; }
       .map-tab { flex: 1; min-width: max-content; padding: 8px 10px; }
       .app { flex-direction: column; overflow: visible; }
       .sidebar { width: 100%; border-right: 0; border-bottom: 1px solid var(--grey-mid); max-height: none; }
@@ -183,8 +186,11 @@
       .farm-list { max-height: none; overflow-y: visible; }
       .farm-item { padding: 14px 16px; }
       .farm-item-name { font-size:14px; }
-      .detail-panel.open { display:block; }
-      .detail-body { max-height: none; }
+      .detail-panel { border-top:0; }
+      .detail-panel.open { display:flex; position:fixed; left:10px; right:10px; bottom:10px; max-height:78vh; z-index:3000; border-radius:18px; overflow:hidden; box-shadow:0 18px 60px rgba(0,0,0,.30); border:1px solid var(--grey-mid); }
+      .detail-header { padding:16px; }
+      .detail-farm-name { font-size:18px; }
+      .detail-body { max-height:48vh; overflow-y:auto; padding:14px 16px; }
       .farm-actions { grid-template-columns: 1fr; margin: 0 16px 14px; }
       .detail-action { margin-left:16px; margin-right:16px; }
       .map-container { display:none; }
@@ -198,14 +204,14 @@
     <div class="nav-logo-mark">V</div>
     <div class="nav-logo-text">VeldRx</div>
   </a>
-  <div class="nav-center">
+  <div class="nav-center desktop-map-tabs">
     <button class="map-tab active" onclick="setLayer('topo')">Terrain</button>
     <button class="map-tab" onclick="setLayer('satellite')">Satellite</button>
     <button class="map-tab" onclick="setLayer('intel')">Disease Intel</button>
   </div>
   <div class="nav-right">
-    <span class="nav-pill">Farm-facing view</span>
-    <a href="practice.html" class="nav-btn">Vet Practice portal</a>
+    <span class="nav-pill">Practice farm book</span>
+    <a href="practice.html" class="nav-btn">Practice workbench</a>
   </div>
 </nav>
 
@@ -231,6 +237,7 @@
       <div><strong class="warn">3</strong><span>Withdrawal</span></div>
       <div><strong class="alert">3</strong><span>Blinking red</span></div>
     </div>
+    <div class="tap-hint">Tap any farm to open its order/risk detail.</div>
     <div class="farm-list" id="farm-list"></div>
     <div class="detail-panel" id="detail-panel">
       <div class="detail-header">
@@ -405,6 +412,7 @@ function selectFarm(farm) {
     <div class="detail-section">
       <div class="detail-section-title">Farm details</div>
       <div class="detail-row"><span class="detail-row-label">Status</span><span class="farm-item-tag tag-${farm.status}">${tagText[farm.status]}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Order</span><span class="detail-row-val">${farm.order} · ${farm.order_status}</span></div>
       <div class="detail-row"><span class="detail-row-label">Next vet visit</span><span class="detail-row-val">${farm.next_visit}</span></div>
       <div class="detail-row"><span class="detail-row-label">Assigned vet</span><span class="detail-row-val">${farm.vet}</span></div>
       <div class="detail-row"><span class="detail-row-label">Last order</span><span class="detail-row-val">${farm.last_order}</span></div>
