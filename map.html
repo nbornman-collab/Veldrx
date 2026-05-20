@@ -437,7 +437,6 @@ function selectFarm(farm) {
   selectedFarmId = selectedFarmId === farm.id ? null : farm.id;
   renderFarmList();
   const item = document.getElementById(`farm-item-${farm.id}`);
-  if (item) item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   if (window.innerWidth > 760 && typeof map !== 'undefined') map.flyTo([farm.lat, farm.lng], 13, { duration: 0.8 });
 
   const tagText = { ok: 'Compliant', warn: 'Withdrawal active', alert: 'Attention needed' };
