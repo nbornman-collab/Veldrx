@@ -150,6 +150,33 @@
     .leaflet-popup-content-wrapper { border-radius: 10px; }
     .farm-popup h4 { font-size: 13px; font-weight: 700; color: var(--green-dark); margin-bottom: 6px; }
     .farm-popup p { font-size: 11px; color: #4a5a4a; margin: 2px 0; }
+
+    @media (max-width: 760px) {
+      body { min-height: 100vh; height: auto; }
+      nav { height: auto; min-height: 58px; padding: 10px 14px; flex-wrap: wrap; gap: 8px; align-items: center; }
+      .nav-logo { order: 1; }
+      .nav-right { order: 2; margin-left: auto; gap: 6px; }
+      .nav-pill { display: none; }
+      .nav-btn { padding: 7px 10px; font-size: 12px; }
+      .nav-center { order: 3; width: 100%; overflow-x: auto; padding-top: 2px; }
+      .map-tab { flex: 1; min-width: max-content; padding: 8px 10px; }
+      .app { flex-direction: column; overflow: visible; }
+      .sidebar { width: 100%; border-right: 0; border-bottom: 1px solid var(--grey-mid); max-height: none; }
+      .sidebar-header { padding: 14px 16px; }
+      .sidebar-search { margin: 10px 16px 0; }
+      .sidebar-filters { padding: 10px 16px; overflow-x: auto; }
+      .filter-chip { white-space: nowrap; }
+      .farm-list { max-height: 280px; overflow-y: auto; }
+      .farm-item { padding: 13px 16px; }
+      .detail-body { max-height: none; }
+      .farm-actions { grid-template-columns: 1fr; margin: 0 16px 12px; }
+      .map-container { min-height: 430px; height: 430px; flex: none; }
+      .map-controls { top: 10px; right: 10px; }
+      .map-control-btn { padding: 8px 10px; font-size: 11px; }
+      .map-stats { left: 10px; right: 10px; bottom: 12px; justify-content: stretch; }
+      .map-stat { flex: 1; padding: 8px; }
+      .map-stat-val { font-size: 17px; }
+    }
   </style>
 </head>
 <body>

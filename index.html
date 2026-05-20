@@ -269,6 +269,30 @@
       .hero-left, .hero-right, .wedge, .workflow, .tiers, .portal-section, .intel, .cta-section, footer, .strip { padding-left: 24px; padding-right: 24px; }
       footer { flex-direction: column; gap: 16px; align-items: flex-start; }
     }
+
+    @media (max-width: 640px) {
+      nav { height: 58px; padding: 0 16px; }
+      .nav-logo-sub { display: none; }
+      .hero { padding-top: 44px; padding-bottom: 44px; gap: 28px; }
+      .hero-left, .hero-right, .wedge, .workflow, .tiers, .portal-section, .intel, .cta-section, footer, .strip { padding-left: 16px; padding-right: 16px; }
+      h1 { font-size: clamp(38px, 12vw, 54px); line-height: 0.98; letter-spacing: -1.7px; }
+      .hero-sub { font-size: 16px; margin-bottom: 22px; }
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .btn-primary, .btn-secondary { justify-content: center; width: 100%; }
+      .hero-stats { grid-template-columns: 1fr; gap: 10px; padding: 14px; }
+      .hero-right { padding-top: 0; padding-bottom: 36px; }
+      .workflow-card { border-radius: 14px; }
+      .workflow-body { padding: 16px; }
+      .workflow-step-top { align-items: flex-start; flex-direction: column; gap: 6px; }
+      .portal-section, .wedge, .workflow, .tiers, .intel, .cta-section { padding-top: 56px; padding-bottom: 56px; }
+      .section-title { font-size: 28px; line-height: 1.08; }
+      .section-sub { margin-bottom: 28px; }
+      .portal-card, .wedge-card, .tier-card, .intel-card { padding: 22px; }
+      .workflow-map, .intel-map { height: 320px; }
+      .strip { padding-top: 28px; padding-bottom: 28px; gap: 16px; }
+      .cta-section h2 { font-size: 30px; }
+      footer { font-size: 12px; }
+    }
   </style>
 </head>
 <body>
