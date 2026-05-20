@@ -151,6 +151,10 @@
     .farm-popup h4 { font-size: 13px; font-weight: 700; color: var(--green-dark); margin-bottom: 6px; }
     .farm-popup p { font-size: 11px; color: #4a5a4a; margin: 2px 0; }
 
+    @keyframes pulseAlert { 0% { box-shadow:0 0 0 0 rgba(153,27,27,.75); transform:scale(1); } 70% { box-shadow:0 0 0 10px rgba(153,27,27,0); transform:scale(1.08); } 100% { box-shadow:0 0 0 0 rgba(153,27,27,0); transform:scale(1); } }
+    .pulse-alert { animation: pulseAlert 1.15s infinite; }
+    .farm-dot.alert-dot { animation: pulseAlert 1.15s infinite; }
+
     @media (max-width: 760px) {
       body { min-height: 100vh; height: auto; }
       nav { height: auto; min-height: 58px; padding: 10px 14px; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -222,10 +226,10 @@
         <div class="detail-farm-sub" id="detail-sub"></div>
       </div>
       <div class="detail-body" id="detail-body"></div>
-      <a href="farm/rooiberg.html" class="detail-action">View order/back-order status →</a>
+      <a href="farm/rooiberg.html" class="detail-action" id="detail-action">View order/back-order status →</a>
       <div class="farm-actions">
-        <a class="farm-action" href="farm/rooiberg.html">Request order</a>
-        <a class="farm-action" href="farm/rooiberg.html">Sign receipt</a>
+        <a class="farm-action" id="request-action" href="farm/rooiberg.html">Request order</a>
+        <a class="farm-action" id="sign-action" href="farm/rooiberg.html">Sign receipt</a>
       </div>
     </div>
   </div>
@@ -239,8 +243,8 @@
     </div>
     <div class="map-stats">
       <div class="map-stat"><div class="map-stat-val" id="stat-compliant">4</div><div class="map-stat-label">Compliant</div></div>
-      <div class="map-stat"><div class="map-stat-val" id="stat-warn" style="color:#b45309">2</div><div class="map-stat-label">Withdrawal</div></div>
-      <div class="map-stat"><div class="map-stat-val" id="stat-alert" style="color:#991b1b">1</div><div class="map-stat-label">Attention</div></div>
+      <div class="map-stat"><div class="map-stat-val" id="stat-warn" style="color:#b45309">3</div><div class="map-stat-label">Withdrawal</div></div>
+      <div class="map-stat"><div class="map-stat-val" id="stat-alert" style="color:#991b1b">3</div><div class="map-stat-label">Attention</div></div>
     </div>
   </div>
 </div>
@@ -249,56 +253,64 @@
 <script>
 const farms = [
   {
-    id: 1, name: "Rooiberg Dairy", lat: -33.42, lng: 18.35, status: "ok",
+    id: 1, slug: "rooiberg", name: "Rooiberg Dairy", lat: -33.42, lng: 18.35, status: "ok",
     herd: "280 dairy cows", next_visit: "Tue 25 Mar", vet: "Dr Van der Merwe",
-    district: "Darling", last_order: "1 Mar 2026",
-    drugs: [
-      { name: "Pen & Strep 100ml", qty: "4 x 100ml", date: "1 Mar", withdrawal: null },
-      { name: "Oxytocin 10ml", qty: "2 x 10ml", date: "1 Mar", withdrawal: null },
-      { name: "Terramycin LA", qty: "1 x 250ml", date: "1 Mar", withdrawal: "Milk 5 days · Meat 28 days" }
-    ]
+    district: "Darling", last_order: "1 Mar 2026", order: "CO-1048", order_status: "Delivered / signed",
+    drugs: [{ name: "Pen & Strep 100ml", qty: "4 x 100ml", date: "1 Mar", withdrawal: null }, { name: "Oxytocin 10ml", qty: "2 x 10ml", date: "1 Mar", withdrawal: null }, { name: "Terramycin LA", qty: "1 x 250ml", date: "1 Mar", withdrawal: "Milk 5 days · Meat 28 days" }]
   },
   {
-    id: 2, name: "Klein Zout Boerdery", lat: -33.28, lng: 18.48, status: "warn",
+    id: 2, slug: "klein-zout", name: "Klein Zout Boerdery", lat: -33.28, lng: 18.48, status: "warn",
     herd: "160 dairy cows · 40 sheep", next_visit: "Wed 26 Mar", vet: "Dr Bosman",
-    district: "Yzerfontein surrounds", last_order: "15 Feb 2026",
-    drugs: [
-      { name: "Mastiplan LC", qty: "12 tubes", date: "18 Feb", withdrawal: "⚠ Milk 72hrs — ACTIVE" },
-      { name: "Dexamethasone", qty: "3 x 50ml", date: "18 Feb", withdrawal: null }
-    ]
+    district: "Yzerfontein surrounds", last_order: "15 Feb 2026", order: "CO-1049", order_status: "Awaiting vet script",
+    drugs: [{ name: "Mastiplan LC", qty: "12 tubes", date: "18 Feb", withdrawal: "⚠ Milk 72hrs — ACTIVE" }, { name: "Dexamethasone", qty: "3 x 50ml", date: "18 Feb", withdrawal: null }]
   },
   {
-    id: 3, name: "Morgenster Plaas", lat: -33.55, lng: 18.28, status: "ok",
+    id: 3, slug: "morgenster", name: "Morgenster Plaas", lat: -33.55, lng: 18.28, status: "ok",
     herd: "420 dairy cows", next_visit: "Thu 27 Mar", vet: "Dr Van der Merwe",
-    district: "Malmesbury", last_order: "1 Mar 2026",
-    drugs: [
-      { name: "Oxymycin 200", qty: "2 x 500ml", date: "1 Mar", withdrawal: null },
-      { name: "Multimin 500ml", qty: "1 x 500ml", date: "1 Mar", withdrawal: null }
-    ]
+    district: "Malmesbury", last_order: "1 Mar 2026", order: "CO-1044", order_status: "Closed",
+    drugs: [{ name: "Oxymycin 200", qty: "2 x 500ml", date: "1 Mar", withdrawal: null }, { name: "Multimin 500ml", qty: "1 x 500ml", date: "1 Mar", withdrawal: null }]
   },
   {
-    id: 4, name: "De Hoek Veeplaas", lat: -33.48, lng: 18.55, status: "alert",
-    herd: "310 dairy cows", next_visit: "Mon 24 Mar", vet: "Unassigned",
-    district: "Darling East", last_order: "Not submitted",
+    id: 4, slug: "de-hoek", name: "De Hoek Veeplaas", lat: -33.48, lng: 18.55, status: "alert",
+    herd: "310 dairy cows", next_visit: "Today overdue", vet: "Unassigned",
+    district: "Darling East", last_order: "Not submitted", order: "NO ORDER", order_status: "Attention needed",
     drugs: []
   },
   {
-    id: 5, name: "Swartland Skape", lat: -33.32, lng: 18.22, status: "ok",
+    id: 5, slug: "swartland-skape", name: "Swartland Skape", lat: -33.32, lng: 18.22, status: "ok",
     herd: "800 merino sheep", next_visit: "Fri 28 Mar", vet: "Dr Bosman",
-    district: "Moorreesburg", last_order: "1 Mar 2026",
-    drugs: [
-      { name: "Ivomec Injection", qty: "2 x 500ml", date: "1 Mar", withdrawal: null },
-      { name: "Multivitamin", qty: "1L", date: "1 Mar", withdrawal: null }
-    ]
+    district: "Moorreesburg", last_order: "1 Mar 2026", order: "CO-1051", order_status: "Picking",
+    drugs: [{ name: "Ivomec Injection", qty: "2 x 500ml", date: "1 Mar", withdrawal: null }, { name: "Multivitamin", qty: "1L", date: "1 Mar", withdrawal: null }]
   },
   {
-    id: 6, name: "Rypveld Dairy", lat: -33.62, lng: 18.42, status: "warn",
+    id: 6, slug: "rypveld-dairy", name: "Rypveld Dairy", lat: -33.62, lng: 18.42, status: "warn",
     herd: "195 dairy cows", next_visit: "Tue 25 Mar", vet: "Dr Van der Merwe",
-    district: "Durbanville surrounds", last_order: "22 Feb 2026",
-    drugs: [
-      { name: "Calcium Borogluconate", qty: "6 x 400ml", date: "22 Feb", withdrawal: null },
-      { name: "Oxytocin", qty: "2 x 10ml", date: "22 Feb", withdrawal: "⚠ Monitoring — post-calving" }
-    ]
+    district: "Durbanville surrounds", last_order: "22 Feb 2026", order: "CO-1052", order_status: "Monitoring",
+    drugs: [{ name: "Calcium Borogluconate", qty: "6 x 400ml", date: "22 Feb", withdrawal: null }, { name: "Oxytocin", qty: "2 x 10ml", date: "22 Feb", withdrawal: "⚠ Monitoring — post-calving" }]
+  },
+  {
+    id: 7, slug: "uitkyk-dairy", name: "Uitkyk Dairy", lat: -33.73, lng: 18.62, status: "alert",
+    herd: "510 dairy cows", next_visit: "Overdue 3 days", vet: "Dr Naidoo",
+    district: "Kraaifontein edge", last_order: "4 Mar 2026", order: "CO-1053", order_status: "Back order",
+    drugs: [{ name: "Mastalone", qty: "8 syringes", date: "4 Mar", withdrawal: "⚠ Milk 96hrs — ACTIVE" }, { name: "Pen & Strep 100ml", qty: "6 x 100ml", date: "4 Mar", withdrawal: "⚠ Meat 31 days — ACTIVE" }]
+  },
+  {
+    id: 8, slug: "paardeberg-boerdery", name: "Paardeberg Boerdery", lat: -33.39, lng: 18.88, status: "ok",
+    herd: "240 beef cattle", next_visit: "Mon 31 Mar", vet: "Dr Bosman",
+    district: "Paardeberg", last_order: "5 Mar 2026", order: "CO-1054", order_status: "Ready to invoice",
+    drugs: [{ name: "Multimin 500ml", qty: "2 x 500ml", date: "5 Mar", withdrawal: null }, { name: "Terramycin LA", qty: "2 x 250ml", date: "5 Mar", withdrawal: null }]
+  },
+  {
+    id: 9, slug: "groenvallei", name: "Groenvallei Melkery", lat: -33.18, lng: 18.67, status: "warn",
+    herd: "365 dairy cows", next_visit: "Thu 3 Apr", vet: "Dr Van der Merwe",
+    district: "Hopefield road", last_order: "6 Mar 2026", order: "CO-1055", order_status: "Out for delivery",
+    drugs: [{ name: "Draxxin", qty: "1 x 100ml", date: "6 Mar", withdrawal: "⚠ Meat 49 days — ACTIVE" }, { name: "Calcium", qty: "4 x 400ml", date: "6 Mar", withdrawal: null }]
+  },
+  {
+    id: 10, slug: "nooitgedacht", name: "Nooitgedacht Farm", lat: -33.69, lng: 18.18, status: "alert",
+    herd: "120 dairy cows · 260 goats", next_visit: "Needs booking", vet: "Unassigned",
+    district: "Atlantis surrounds", last_order: "28 Feb 2026", order: "CO-1056", order_status: "Missing receipt",
+    drugs: [{ name: "Oxytocin 10ml", qty: "2 x 10ml", date: "28 Feb", withdrawal: null }, { name: "Pen & Strep 100ml", qty: "3 x 100ml", date: "28 Feb", withdrawal: "⚠ Admin date unconfirmed" }]
   }
 ];
 
@@ -341,7 +353,7 @@ function renderFarmList() {
     div.id = `farm-item-${f.id}`;
     const tagText = { ok: 'Compliant', warn: 'Withdrawal active', alert: 'Attention needed' };
     div.innerHTML = `
-      <div class="farm-dot" style="background:${colors[f.status]}"></div>
+      <div class="farm-dot ${f.status === 'alert' ? 'alert-dot' : ''}" style="background:${colors[f.status]}"></div>
       <div>
         <div class="farm-item-name">${f.name}</div>
         <div class="farm-item-meta">${f.herd} · ${f.district}</div>
@@ -356,7 +368,7 @@ function renderFarmList() {
 function createMarkerIcon(status) {
   return L.divIcon({
     className: '',
-    html: `<div style="width:16px;height:16px;border-radius:50%;background:${colors[status]};border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.25)"></div>`,
+    html: `<div class="${status === 'alert' ? 'pulse-alert' : ''}" style="width:16px;height:16px;border-radius:50%;background:${colors[status]};border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.25)"></div>`,
     iconSize: [16, 16], iconAnchor: [8, 8]
   });
 }
@@ -394,6 +406,10 @@ function selectFarm(farm) {
             ${d.withdrawal ? `<div class="withdrawal-badge">${d.withdrawal}</div>` : ''}
           </div>`).join('')}
     </div>`;
+  const farmUrl = `farm/${farm.slug}.html`;
+  document.getElementById('detail-action').href = farmUrl;
+  document.getElementById('request-action').href = farmUrl;
+  document.getElementById('sign-action').href = farmUrl;
   document.getElementById('detail-panel').classList.add('open');
 }
 
