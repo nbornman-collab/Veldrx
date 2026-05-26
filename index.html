@@ -136,7 +136,7 @@
       border-radius: 10px; font-size: 12px; color: #9a3412; line-height: 1.45;
     }
     .portal-section { padding: 100px 80px; background: var(--white); }
-    .portal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .portal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
     .portal-card {
       background: var(--grey-light); border: 1px solid var(--grey-mid); border-radius: 18px;
       padding: 30px; display: flex; flex-direction: column; min-height: 330px;
@@ -323,13 +323,13 @@
     <a href="#workflow">Workflow</a>
     <a href="#tiers">Pricing</a>
     <a href="#intel">What comes next</a>
-    <a href="practice.html" class="nav-cta">Open workbench →</a>
+    <a href="compliance.html" class="nav-cta">Audit demo →</a>
   </div>
 </nav>
 
 <section class="hero">
   <div class="hero-left">
-    <div class="hero-badge">Product map incorporated · first half</div>
+    <div class="hero-badge">Product map incorporated · second half</div>
     <h1>The operating system for <span>vet medicine orders</span></h1>
     <p class="hero-sub">VeldRx connects customer orders, stock on hand, supplier ordering, Act 101 compliance, back-orders, delivery signatures and rep intelligence. The practice runs the workflow; the farm gets a simple portal for requests, documents and signatures.</p>
     <div class="hero-points">
@@ -339,7 +339,7 @@
     </div>
     <div class="hero-actions">
       <a href="practice.html" class="btn-primary">Open practice workbench →</a>
-      <a href="map.html" class="btn-secondary">Open farm book</a>
+      <a href="compliance.html" class="btn-secondary">Open audit demo</a>
     </div>
     <div class="hero-stats">
       <div>
@@ -395,8 +395,8 @@
 
 <section class="portal-section" id="portals">
   <div class="section-label">One app</div>
-  <div class="section-title">One practice workbench. Farm records inside it.</div>
-  <div class="section-sub">The demo now reads as one operating system: the practice works the orders; each farm record opens from the same book.</div>
+  <div class="section-title">One practice workbench. Farm records and audit reports inside it.</div>
+  <div class="section-sub">The demo now reads as one operating system: the practice works the orders; each farm record opens from the same book; antibiotic audit reports are generated from the live treatment trail.</div>
   <div class="portal-grid">
     <div class="portal-card featured">
       <div class="portal-kicker">Practice workbench</div>
@@ -419,6 +419,17 @@
         <div class="portal-item">Sign receipt digitally and access documents</div>
       </div>
       <a class="portal-link" href="map.html">Open farm book →</a>
+    </div>
+    <div class="portal-card">
+      <div class="portal-kicker">Compliance demo</div>
+      <div class="portal-title">Treatment sheet to audit report</div>
+      <div class="portal-desc">A single mastitis case shows the second-half product: medicine cabinet, vet script, farm treatment sheet, milk withdrawal control and annual antibiotic usage review.</div>
+      <div class="portal-list">
+        <div class="portal-item">Batch-level medicine traceability</div>
+        <div class="portal-item">Animal treatment and withdrawal status</div>
+        <div class="portal-item">Vet-reviewed antibiotic audit output</div>
+      </div>
+      <a class="portal-link" href="compliance.html">Open compliance demo →</a>
     </div>
   </div>
 </section>

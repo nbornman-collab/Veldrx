@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medicine Compliance Demo — VeldRx</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{--green-dark:#1e3a1e;--green-mid:#2d5c2d;--green-light:#4a8c4a;--green-pale:#e8f0e8;--white:#fff;--grey-light:#f7f8f6;--grey-mid:#e2e8e2;--text-dark:#1a2418;--text-mid:#4a5a4a;--text-light:#7a8a7a;--amber:#b45309;--amber-bg:#fff7ed;--red:#991b1b;--red-bg:#fee2e2;--blue:#1d4ed8;--blue-bg:#eff6ff}
+    body{font-family:Inter,sans-serif;background:var(--grey-light);color:var(--text-dark)}
+    nav{height:60px;background:white;border-bottom:1px solid var(--grey-mid);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:20}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none}.mark{width:30px;height:30px;border-radius:7px;background:var(--green-dark);color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}.brand-text{color:var(--green-dark);font-weight:800}.nav-links{display:flex;gap:10px;align-items:center}.nav-links a{color:var(--text-mid);text-decoration:none;font-size:13px;font-weight:700;padding:8px 12px;border-radius:8px}.nav-links a.active,.nav-links a:hover{background:var(--green-pale);color:var(--green-dark)}
+    .page{max-width:1320px;margin:0 auto;padding:28px}.hero{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;margin-bottom:20px}.eyebrow{color:var(--green-light);text-transform:uppercase;letter-spacing:.8px;font-size:12px;font-weight:800;margin-bottom:8px}h1{color:var(--green-dark);font-size:36px;letter-spacing:-.8px;margin-bottom:9px;line-height:1.05}.sub{color:var(--text-mid);line-height:1.6;max-width:790px;font-size:15px}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:0;border-radius:8px;padding:11px 16px;font:inherit;font-weight:800;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:7px}.btn-primary{background:var(--green-dark);color:white}.btn-secondary{background:white;color:var(--green-dark);border:1px solid var(--grey-mid)}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.kpi{background:white;border:1px solid var(--grey-mid);border-radius:14px;padding:18px}.kpi-label{font-size:11px;color:var(--text-light);text-transform:uppercase;font-weight:800;letter-spacing:.5px}.kpi-val{font-size:25px;font-weight:800;color:var(--green-dark);margin-top:7px}.kpi-sub{font-size:12px;color:var(--text-light);margin-top:3px;line-height:1.35}
+    .journey{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}.step{background:white;border:1px solid var(--grey-mid);border-radius:14px;padding:16px;position:relative;overflow:hidden}.step:before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--green-light)}.step-num{font-size:11px;color:var(--green-light);text-transform:uppercase;font-weight:800;letter-spacing:.5px;margin-bottom:8px}.step-title{font-size:15px;font-weight:800;color:var(--green-dark);margin-bottom:5px}.step-sub{font-size:12px;color:var(--text-mid);line-height:1.45}
+    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-bottom:18px}.card{background:white;border:1px solid var(--grey-mid);border-radius:14px;padding:18px}.card-title{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;font-size:14px;font-weight:900;color:var(--green-dark);margin-bottom:14px}.hint{font-size:12px;color:var(--text-light);font-weight:700}table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;color:var(--text-light);font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:9px 10px;background:var(--grey-light)}td{padding:12px 10px;border-bottom:1px solid var(--grey-mid);color:var(--text-mid);vertical-align:top}tr:last-child td{border-bottom:0}td strong{color:var(--text-dark)}.pill{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900;white-space:nowrap}.ok{background:#dcfce7;color:#166534}.warn{background:var(--amber-bg);color:var(--amber)}.risk{background:var(--red-bg);color:var(--red)}.info{background:var(--blue-bg);color:var(--blue)}
+    .ledger{display:grid;gap:10px}.ledger-row{display:grid;grid-template-columns:125px 1fr auto;gap:12px;align-items:start;padding:12px;border:1px solid var(--grey-mid);border-radius:12px;background:#fbfcfa}.date{font-size:12px;font-weight:900;color:var(--green-dark)}.ledger-title{font-size:13px;font-weight:900;color:var(--text-dark)}.ledger-sub{font-size:12px;color:var(--text-mid);line-height:1.45;margin-top:3px}.report-head{background:var(--green-dark);color:white;border-radius:14px 14px 0 0;padding:18px}.report-head h2{font-size:20px;margin-bottom:5px}.report-head p{font-size:12px;color:rgba(255,255,255,.75);line-height:1.45}.report-body{border:1px solid var(--grey-mid);border-top:0;border-radius:0 0 14px 14px;background:white;padding:18px}.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}.mini{border:1px solid var(--grey-mid);border-radius:12px;padding:12px}.mini-label{font-size:10px;color:var(--text-light);font-weight:900;text-transform:uppercase;letter-spacing:.4px}.mini-val{font-size:18px;font-weight:900;color:var(--green-dark);margin-top:5px}.signoff{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.sig{border:1px dashed #b8c4b8;border-radius:10px;padding:12px;background:#fbfcfa}.sig-label{font-size:10px;color:var(--text-light);text-transform:uppercase;font-weight:900;letter-spacing:.4px}.sig-val{font-size:13px;color:var(--text-dark);font-weight:800;margin-top:8px}.callout{padding:14px;border-radius:12px;background:var(--amber-bg);color:#9a3412;border:1px solid #fed7aa;font-size:13px;line-height:1.5}.print-note{font-size:12px;color:var(--text-light);line-height:1.45;margin-top:10px}
+    @media(max-width:900px){nav{height:auto;min-height:58px;padding:10px 14px;gap:12px;align-items:flex-start}.nav-links{overflow-x:auto;max-width:68vw;padding-bottom:2px;gap:6px}.nav-links a{white-space:nowrap;padding:7px 9px;font-size:12px}.page{padding:18px 14px 36px}.hero,.grid{grid-template-columns:1fr}.actions{display:grid;grid-template-columns:1fr}.btn{justify-content:center}.kpis,.journey,.mini-grid,.signoff{grid-template-columns:1fr}.kpi,.card{padding:15px}h1{font-size:28px}.ledger-row{grid-template-columns:1fr;gap:7px}table{display:block;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}th,td{padding:10px 9px}}
+  </style>
+</head>
+<body>
+<nav>
+  <a class="brand" href="index.html"><div class="mark">V</div><div class="brand-text">VeldRx</div></a>
+  <div class="nav-links">
+    <a href="practice.html">Practice Workbench</a>
+    <a href="map.html">Farm Book</a>
+    <a class="active" href="compliance.html">Compliance Demo</a>
+    <a href="farm/rypveld-dairy.html">Rypveld</a>
+  </div>
+</nav>
+<main class="page">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Second-half demo · audited medicine usage</div>
+      <h1>Rypveld Dairy: antibiotic issued, treatment logged, withdrawal controlled, audit report ready.</h1>
+      <p class="sub">This is the compliance half of VeldRx: the practice does not merely dispense. It proves the full chain from medicine stock and vet approval through farm treatment, milk withholding and annual antibiotic review.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary" href="#audit">View audit report</a>
+      <a class="btn btn-secondary" href="farm/rypveld-dairy.html">Open farm profile</a>
+    </div>
+  </section>
+
+  <section class="kpis">
+    <div class="kpi"><div class="kpi-label">Case</div><div class="kpi-val">Mastitis</div><div class="kpi-sub">Cow 4187 · left rear quarter</div></div>
+    <div class="kpi"><div class="kpi-label">Medicine</div><div class="kpi-val">Synulox LC</div><div class="kpi-sub">Batch SL-24-118 · intramammary tubes</div></div>
+    <div class="kpi"><div class="kpi-label">Milk withdrawal</div><div class="kpi-val" style="color:var(--amber)">84 hrs</div><div class="kpi-sub">Fit for tank from 01 Jun 08:00</div></div>
+    <div class="kpi"><div class="kpi-label">Audit status</div><div class="kpi-val">Ready</div><div class="kpi-sub">Vet review and farm sign-off captured</div></div>
+  </section>
+
+  <section class="journey">
+    <div class="step"><div class="step-num">Step 01</div><div class="step-title">Medicine cabinet</div><div class="step-sub">Stock received, bottle/tube batch, expiry and supplier recorded before dispensing.</div></div>
+    <div class="step"><div class="step-num">Step 02</div><div class="step-title">Vet approval</div><div class="step-sub">Act 101 prescription and diagnosis linked to the farm order.</div></div>
+    <div class="step"><div class="step-num">Step 03</div><div class="step-title">Treatment sheet</div><div class="step-sub">Farmer records animal, dose, route, dates, administrator and withdrawal period.</div></div>
+    <div class="step"><div class="step-num">Step 04</div><div class="step-title">Audit pack</div><div class="step-sub">Annual antibiotic usage is collated by product, reason and HP-CIA flag.</div></div>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <div class="card-title">Medicine cabinet / dispensing trail <span class="hint">Stock → prescription → farm issue</span></div>
+      <table>
+        <thead><tr><th>Product</th><th>Act</th><th>Batch</th><th>Expiry</th><th>Issued</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Synulox LC</strong><br>Intramammary antibiotic tubes</td><td>Act 101</td><td>SL-24-118</td><td>2027-02</td><td>3 tubes · CO-1088</td><td><span class="pill ok">Script linked</span></td></tr>
+          <tr><td><strong>Ketofen 10%</strong><br>Anti-inflammatory support</td><td>Act 101</td><td>KF-26-044</td><td>2026-11</td><td>20ml</td><td><span class="pill ok">Label printed</span></td></tr>
+          <tr><td><strong>California Mastitis Test</strong><br>Screening reagent</td><td>Act 36</td><td>CMT-1451</td><td>2027-06</td><td>1 bottle</td><td><span class="pill info">No withdrawal</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Treatment sheet / farm record <span class="hint">What gets audited</span></div>
+      <table>
+        <thead><tr><th>Field</th><th>Recorded value</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Animal ID</strong></td><td>Cow 4187 · Rypveld Dairy</td></tr>
+          <tr><td><strong>Reason</strong></td><td>Clinical mastitis · left rear quarter</td></tr>
+          <tr><td><strong>Treatment dates</strong></td><td>29–30 May 2026 · 3 treatments</td></tr>
+          <tr><td><strong>Dose / route</strong></td><td>1 tube per treatment · intramammary</td></tr>
+          <tr><td><strong>Administered by</strong></td><td>Pieter Jacobs · dairy manager</td></tr>
+          <tr><td><strong>Milk withdrawal</strong></td><td><span class="pill warn">Until 01 Jun 2026 · 08:00</span></td></tr>
+          <tr><td><strong>Meat withdrawal</strong></td><td>7 days · until 06 Jun 2026</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <div class="card-title">Withdrawal control timeline <span class="hint">The expensive mistake prevention layer</span></div>
+      <div class="ledger">
+        <div class="ledger-row"><div class="date">29 May · 06:40</div><div><div class="ledger-title">Mastitis case opened</div><div class="ledger-sub">Cow 4187 flagged. Milk diverted from bulk tank before first treatment.</div></div><span class="pill info">Open</span></div>
+        <div class="ledger-row"><div class="date">29 May · 07:10</div><div><div class="ledger-title">Synulox LC treatment started</div><div class="ledger-sub">Batch SL-24-118 and vet script Rx-TAH-8832 attached automatically from dispensing record.</div></div><span class="pill ok">Traceable</span></div>
+        <div class="ledger-row"><div class="date">30 May · 07:25</div><div><div class="ledger-title">Final treatment completed</div><div class="ledger-sub">System recalculated withdrawal: milk fit for tank from 01 Jun 2026 at 08:00.</div></div><span class="pill warn">Withhold</span></div>
+        <div class="ledger-row"><div class="date">01 Jun · 08:00</div><div><div class="ledger-title">Return-to-tank gate</div><div class="ledger-sub">Prompt requires farm confirmation or optional antibiotic residue test result before status goes green.</div></div><span class="pill risk">Pending</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Audit risk prompt</div>
+      <div class="callout"><strong>VeldRx warning:</strong> Cow 4187 is still under milk withdrawal. Do not return milk to tank until 01 Jun 2026 08:00 and manager confirmation is captured. If a residue test is performed, upload result against this case.</div>
+      <div class="print-note">This is the bit that makes the product useful in the real world: the audit record is generated by doing the job properly, not recreated at month-end from memory.</div>
+    </div>
+  </section>
+
+  <section id="audit">
+    <div class="report-head">
+      <h2>Annual Antibiotic Usage Review — Rypveld Dairy</h2>
+      <p>Demo report for vet/practice audit: usage collated from medicine cabinet, customer orders and farm treatment sheets.</p>
+    </div>
+    <div class="report-body">
+      <div class="mini-grid">
+        <div class="mini"><div class="mini-label">Review period</div><div class="mini-val">2026 YTD</div></div>
+        <div class="mini"><div class="mini-label">Animals treated</div><div class="mini-val">14 / 195</div></div>
+        <div class="mini"><div class="mini-label">HP-CIA usage</div><div class="mini-val" style="color:#166534">0</div></div>
+      </div>
+      <table>
+        <thead><tr><th>Antibiotic product</th><th>Quantity used</th><th>Animals</th><th>Primary reason</th><th>HP-CIA?</th><th>Vet comment</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Synulox LC</strong></td><td>27 tubes</td><td>9 cows</td><td>Mastitis</td><td><span class="pill ok">No</span></td><td>Within expected seasonal range; hygiene review scheduled.</td></tr>
+          <tr><td><strong>Pen & Strep</strong></td><td>180ml</td><td>4 cows</td><td>Lameness / wound</td><td><span class="pill ok">No</span></td><td>Use remains targeted; no blanket preventative use recorded.</td></tr>
+          <tr><td><strong>Terramycin LA</strong></td><td>40ml</td><td>1 cow</td><td>Respiratory</td><td><span class="pill ok">No</span></td><td>Single animal treatment only.</td></tr>
+          <tr><td><strong>Enrofloxacin / fluoroquinolone</strong></td><td>0</td><td>0</td><td>None</td><td><span class="pill ok">Not used</span></td><td>No critically important antibiotic use in period.</td></tr>
+        </tbody>
+      </table>
+      <div class="signoff">
+        <div class="sig"><div class="sig-label">Vet review</div><div class="sig-val">Dr Van der Merwe · reviewed 26 May 2026</div></div>
+        <div class="sig"><div class="sig-label">Farm acknowledgement</div><div class="sig-val">Pieter Jacobs · signed digitally</div></div>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
