@@ -1,0 +1,16 @@
+{
+  "name": "glasshouse",
+  "version": "1.0.0",
+  "description": "Glasshouse buyer intelligence L0-L3 complete route",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
